@@ -1,0 +1,10 @@
+# Ignore Python backend files from Vercel serverless function detection
+app.py
+generate_synthetic.py
+requirements.txt
+src/
+tests/
+data/
+db/
+docs/
+*.md
