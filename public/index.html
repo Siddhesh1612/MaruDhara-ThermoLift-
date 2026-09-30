@@ -15,40 +15,37 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow-x: hidden;
-            background-color: #040814;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+            background-color: #030712;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             color: #f1f5f9;
+            user-select: none;
+        }
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: grab;
+        }
+        #canvas-container:active {
+            cursor: grabbing;
         }
         .hud-glass {
-            background: rgba(10, 16, 32, 0.85);
+            background: rgba(10, 16, 32, 0.88);
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
             border: 1px solid rgba(255, 255, 255, 0.12);
             box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
         }
-        .hud-card {
+        .hud-glass-subtle {
             background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(14px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-            transition: all 0.2s ease;
         }
-        .hud-card:hover {
-            border-color: rgba(245, 158, 11, 0.4);
-            transform: translateY(-2px);
-        }
-        .stroke-banner-up {
-            background: linear-gradient(90deg, rgba(14, 165, 233, 0.25) 0%, rgba(56, 189, 248, 0.35) 50%, rgba(14, 165, 233, 0.25) 100%);
-            border: 1px solid rgba(56, 189, 248, 0.5);
-            color: #38bdf8;
-        }
-        .stroke-banner-down {
-            background: linear-gradient(90deg, rgba(245, 158, 11, 0.25) 0%, rgba(251, 191, 36, 0.35) 50%, rgba(245, 158, 11, 0.25) 100%);
-            border: 1px solid rgba(245, 158, 11, 0.5);
-            color: #fbbf24;
-        }
+        /* 3D Label Callouts */
         .annotation-pin {
             position: absolute;
             pointer-events: auto;
@@ -60,299 +57,391 @@
             border-radius: 8px;
             font-size: 11px;
             font-weight: 700;
+            letter-spacing: 0.5px;
             white-space: nowrap;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
-            transform: translate(-50%, -100%);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6), 0 0 10px rgba(245, 158, 11, 0.35);
             transition: all 0.2s ease;
+            transform: translate(-50%, -100%);
         }
         .annotation-pin:hover {
             background: #d97706;
-            color: #fff;
+            color: #ffffff;
+            border-color: #fbbf24;
             transform: translate(-50%, -108%) scale(1.05);
         }
-        input[type="range"] {
-            accent-color: #f59e0b;
+        /* Phase Glow Bar */
+        .stroke-banner-up {
+            background: linear-gradient(90deg, rgba(14, 165, 233, 0.25) 0%, rgba(56, 189, 248, 0.35) 50%, rgba(14, 165, 233, 0.25) 100%);
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            color: #38bdf8;
+        }
+        .stroke-banner-down {
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.25) 0%, rgba(251, 191, 36, 0.35) 50%, rgba(245, 158, 11, 0.25) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            color: #fbbf24;
+        }
+        /* Custom scrollbar for sidebar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 flex flex-col min-h-screen">
+<body class="flex h-screen w-screen overflow-hidden bg-[#030712]">
 
-    <!-- TOP MANDATORY PROTOTYPE BANNER -->
-    <div class="bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 text-white font-bold text-center py-2 px-4 text-xs tracking-wider uppercase shadow-md border-b border-amber-500/40">
-        PROTOTYPE MODE — REPRESENTATIVE SYNTHETIC DATA • OIL INDIA LIMITED (SIH26120)
-    </div>
-
-    <!-- MAIN HEADER -->
-    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur px-6 py-3.5 flex justify-between items-center sticky top-0 z-30">
-        <div class="flex items-center space-x-3">
-            <span class="text-2xl font-black text-amber-500">⚡ THERMOLIFT</span>
-            <span class="text-xs px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/40 font-mono">
-                MaruDhara Twin
-            </span>
-            <span class="text-xs text-slate-400 hidden md:inline">| Baghewala Heavy Oil Field • Well <b>BWG-SIM-001</b></span>
-        </div>
-        <div class="flex items-center space-x-3 text-xs">
-            <span class="flex items-center space-x-1.5 bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/30 font-semibold">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>PHYSICS TWIN ACTIVE</span>
-            </span>
-            <button onclick="toggleFullscreen()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-lg border border-slate-700 font-medium transition" title="Toggle Fullscreen">
-                ⛶ Fullscreen
-            </button>
-        </div>
-    </header>
-
-    <!-- 3D DIGITAL TWIN HERO SECTION -->
-    <div class="relative w-full h-[640px] md:h-[720px] bg-slate-950 border-b border-slate-800 overflow-hidden">
-        <div id="canvas-container" class="w-full h-full absolute inset-0"></div>
-
-        <!-- 3D View Toolbar -->
-        <div class="absolute top-4 left-4 right-4 flex justify-between items-start pointer-events-none z-10">
-            <!-- Asset info -->
-            <div class="hud-glass rounded-xl px-4 py-2.5 pointer-events-auto flex items-center space-x-3">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-                <div>
-                    <div class="text-xs font-bold text-white font-mono">BWG-SIM-001</div>
-                    <div class="text-[10px] text-slate-400">Jodhpur Sandstone • 4-Bar Linkage Kinematics</div>
-                </div>
+    <!-- LEFT INDUSTRIAL SIDEBAR (MATCHING STREAMLIT EXACTLY) -->
+    <aside id="main-sidebar" class="w-72 md:w-80 flex-shrink-0 bg-[#0b0f19] border-r border-slate-800 flex flex-col z-30 overflow-y-auto transition-all duration-300">
+        <!-- Top Brand Section -->
+        <div class="p-4 border-b border-slate-800/80 bg-slate-950/40">
+            <div class="flex items-center space-x-2 text-amber-500 font-extrabold text-lg tracking-wide">
+                <span class="text-xl">⚡</span>
+                <span>THERMOLIFT</span>
             </div>
-
-            <!-- View Presets -->
-            <div class="hud-glass rounded-xl p-1.5 pointer-events-auto flex items-center space-x-1.5">
-                <button onclick="setCameraView('surface')" class="view-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-600 text-white transition flex items-center space-x-1" id="btn-view-surface">
-                    <span>🏗️ Surface Unit</span>
-                </button>
-                <button onclick="setCameraView('pump')" class="view-btn px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-amber-600 hover:text-white text-slate-200 transition flex items-center space-x-1" id="btn-view-pump">
-                    <span>⚙️ Pump & Valves</span>
-                </button>
-                <button onclick="setCameraView('reservoir')" class="view-btn px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-amber-600 hover:text-white text-slate-200 transition flex items-center space-x-1" id="btn-view-res">
-                    <span>🔥 Reservoir Cutaway</span>
-                </button>
-                <button onclick="setCameraView('profile')" class="view-btn px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-amber-600 hover:text-white text-slate-200 transition flex items-center space-x-1" id="btn-view-prof">
-                    <span>📐 Full Profile</span>
-                </button>
-                <button id="btn-labels" onclick="toggleLabels()" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Toggle 3D Labels">
-                    🏷️ Labels
-                </button>
-                <button id="btn-pause" onclick="togglePlayPause()" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Pause Kinematics">
-                    ⏸️
-                </button>
-            </div>
+            <div class="text-[11px] text-slate-300 font-medium mt-0.5">MaruDhara Decision Twin • SIH26120</div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Oil India Limited • Baghewala Heavy Oil</div>
         </div>
 
-        <!-- Dynamic Stroke Phase Banner -->
-        <div class="absolute top-16 left-1/2 -translate-x-1/2 pointer-events-none z-10">
-            <div id="stroke-phase-banner" class="stroke-banner-up px-4 py-1.5 rounded-full text-xs font-mono font-bold tracking-wide shadow-lg transition-all flex items-center space-x-2">
-                <span id="stroke-phase-icon">⬆️</span>
-                <span id="stroke-phase-text">UPSTROKE: Traveling Valve CLOSED • Standing Valve OPEN (Intake)</span>
-            </div>
-        </div>
-
-        <!-- Live Telemetry HUD Bottom Right -->
-        <div class="absolute bottom-4 right-4 w-76 hud-glass rounded-xl p-3.5 pointer-events-auto z-10 text-xs font-mono space-y-1.5">
-            <div class="flex justify-between items-center pb-1.5 border-b border-slate-700">
-                <span class="font-bold text-slate-200 uppercase tracking-wider text-[11px]">Telemetry HUD</span>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300" id="hud-spm-badge">7.0 SPM</span>
-            </div>
-            <div class="flex justify-between">
-                <span class="text-slate-400">Dynamic Rod Load:</span>
-                <span class="font-bold text-rose-400" id="hud-live-load">46.2 kN</span>
-            </div>
-            <div class="flex justify-between">
-                <span class="text-slate-400">Reservoir Temp:</span>
-                <span class="font-bold text-amber-400" id="hud-temp">62.5 °C</span>
-            </div>
-            <div class="flex justify-between">
-                <span class="text-slate-400">Oil Viscosity:</span>
-                <span class="font-bold text-cyan-400" id="hud-visc">7.20 kcP</span>
-            </div>
-            <div class="flex justify-between">
-                <span class="text-slate-400">Net Oil Rate:</span>
-                <span class="font-bold text-emerald-400" id="hud-oil">34.5 bpd</span>
-            </div>
-            <div class="flex justify-between">
-                <span class="text-slate-400">Pump Fillage:</span>
-                <span class="font-bold text-blue-400" id="hud-fillage">68.0 %</span>
-            </div>
-        </div>
-
-        <!-- Component Inspector Bottom Left -->
-        <div id="inspector-card" class="absolute bottom-4 left-4 w-84 hud-glass rounded-xl p-3.5 pointer-events-auto z-10 max-w-sm">
-            <div class="flex justify-between items-start mb-1 pb-1 border-b border-slate-700">
-                <div>
-                    <div class="text-[9px] font-bold text-amber-400 uppercase">Component Inspector</div>
-                    <div id="insp-title" class="text-xs font-bold text-white">Sucker Rod Pumping Unit</div>
-                </div>
-                <span id="insp-badge" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300">SURFACE</span>
-            </div>
-            <p id="insp-desc" class="text-[11px] text-slate-300 leading-snug">
-                Click any 3D mechanical part or label to inspect engineering function, valve mechanics, and physics telemetry.
-            </p>
-        </div>
-
-        <!-- 3D Pins Container -->
-        <div id="pins-container" class="absolute inset-0 pointer-events-none z-10" style="display: none;">
-            <div id="pin-horsehead" class="annotation-pin" onclick="inspectPart('horsehead')">🐴 Horsehead & Bridle</div>
-            <div id="pin-beam" class="annotation-pin" onclick="inspectPart('walkingBeam')">⚖️ Walking Beam</div>
-            <div id="pin-sampson" class="annotation-pin" onclick="inspectPart('sampsonPost')">🏗️ Samson Post</div>
-            <div id="pin-crank" class="annotation-pin" onclick="inspectPart('crank')">⚙️ Counterweights</div>
-            <div id="pin-wellhead" class="annotation-pin" onclick="inspectPart('stuffingBox')">🛢️ Stuffing Box</div>
-            <div id="pin-reservoir" class="annotation-pin" onclick="inspectPart('reservoir')">🔥 Jodhpur Sandstone</div>
-            <div id="pin-pump" class="annotation-pin" onclick="inspectPart('downholePump')">⚙️ Downhole Pump</div>
-        </div>
-    </div>
-
-    <!-- WHAT-IF PHYSICS SIMULATOR & TELEMETRY CONTROLS -->
-    <main class="max-w-7xl mx-auto px-4 py-8 space-y-8 flex-1">
-        <div class="flex justify-between items-center">
+        <!-- Well Selector & Telemetry Meta -->
+        <div class="p-4 space-y-3.5 border-b border-slate-800/80">
             <div>
-                <h2 class="text-xl font-extrabold text-white">⚡ Real-Time What-If Physics Simulator</h2>
-                <p class="text-xs text-slate-400">Modulate cyclic steam injection and pump speed to recalculate coupled thermal viscosity, inflow, and rod loads.</p>
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Well Selector</label>
+                <select class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-2 text-xs font-semibold text-slate-200 focus:outline-none focus:border-amber-500">
+                    <option>BWG-SIM-001</option>
+                </select>
             </div>
-            <button onclick="resetSliders()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 font-semibold transition">
-                🔄 Reset to Baseline
-            </button>
+
+            <div class="space-y-2 text-xs">
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-400">Cycle Phase:</span>
+                    <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold text-[11px] flex items-center space-x-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>PRODUCTION</span>
+                    </span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-400">Data Quality:</span>
+                    <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30 font-bold text-[11px] flex items-center space-x-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                        <span>SUSPECT</span>
+                    </span>
+                </div>
+
+                <div>
+                    <span class="text-slate-400 block mb-1 text-[11px]">State Hash:</span>
+                    <div class="font-mono text-[10px] text-emerald-400 bg-slate-950 p-2 rounded-lg border border-slate-800/90 break-all select-all leading-tight">
+                        SHA-256:3cf2f50e2963e5d7
+                    </div>
+                </div>
+
+                <!-- Uncertainty Gate Banner (Amber) -->
+                <div class="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                    <div class="text-[9px] font-extrabold uppercase tracking-wider text-amber-400/90 mb-0.5">Uncertainty Gate:</div>
+                    <div class="text-xs font-bold flex items-center space-x-1.5">
+                        <span>⚠️</span>
+                        <span>AMBER — OPERATOR CAUTION</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between text-[11px] font-mono pt-1">
+                    <span class="text-slate-400">Seed Trace:</span>
+                    <span class="text-emerald-400 font-bold">26120</span>
+                </div>
+
+                <div class="flex items-center justify-between text-[11px] font-mono">
+                    <span class="text-slate-400">Model Release:</span>
+                    <span class="text-slate-300 font-semibold">v1.0</span>
+                </div>
+            </div>
         </div>
 
-        <!-- Control Sliders -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="hud-card p-4">
-                <div class="flex justify-between text-xs font-semibold mb-2">
-                    <span class="text-slate-400">Steam Mass ($m_s$):</span>
-                    <span class="text-amber-400 font-mono" id="val-steam">110 t</span>
+        <!-- Real-Time What-If Physics Simulator Controls -->
+        <div class="p-4 space-y-4 flex-1">
+            <div class="flex items-center justify-between pb-1 border-b border-slate-800/60">
+                <span class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center space-x-1.5">
+                    <span class="text-amber-400">⚡</span>
+                    <span>What-If Simulator</span>
+                </span>
+                <button onclick="resetSliders()" class="text-[10px] text-amber-400 hover:text-amber-300 font-semibold px-2 py-0.5 rounded bg-slate-800 border border-slate-700 transition">
+                    Reset
+                </button>
+            </div>
+
+            <!-- Steam Mass Slider -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-xs">
+                    <span class="text-slate-300 font-medium">Steam Mass ($m_s$):</span>
+                    <span id="sidebar-val-steam" class="font-bold text-amber-400 font-mono">110 t</span>
                 </div>
-                <input type="range" id="slider-steam" min="60" max="140" value="110" step="1" class="w-full" oninput="updatePhysics()">
-                <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                <input type="range" id="slider-steam" min="60" max="140" value="110" step="1" oninput="updatePhysicsFromSliders()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                <div class="flex justify-between text-[10px] text-slate-500 font-mono">
                     <span>60 t</span>
-                    <span class="text-amber-500 font-medium">Limit: 118 t</span>
+                    <span class="text-amber-500 font-semibold">Limit: 118 t</span>
                     <span>140 t</span>
                 </div>
             </div>
 
-            <div class="hud-card p-4">
-                <div class="flex justify-between text-xs font-semibold mb-2">
-                    <span class="text-slate-400">Soak Duration ($t_{soak}$):</span>
-                    <span class="text-amber-400 font-mono" id="val-soak">48 h</span>
+            <!-- Soak Duration Slider -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-xs">
+                    <span class="text-slate-300 font-medium">Soak Duration ($t_{soak}$):</span>
+                    <span id="sidebar-val-soak" class="font-bold text-amber-400 font-mono">48 h</span>
                 </div>
-                <input type="range" id="slider-soak" min="24" max="96" value="48" step="2" class="w-full" oninput="updatePhysics()">
-                <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                <input type="range" id="slider-soak" min="24" max="96" value="48" step="1" oninput="updatePhysicsFromSliders()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                <div class="flex justify-between text-[10px] text-slate-500 font-mono">
                     <span>24 h</span>
                     <span>48 h (Nominal)</span>
                     <span>96 h</span>
                 </div>
             </div>
 
-            <div class="hud-card p-4">
-                <div class="flex justify-between text-xs font-semibold mb-2">
-                    <span class="text-slate-400">Pumping Speed (SPM):</span>
-                    <span class="text-amber-400 font-mono" id="val-spm">7.0 SPM</span>
+            <!-- Pumping Speed (SPM) Slider -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-xs">
+                    <span class="text-slate-300 font-medium">Pump Speed (SPM):</span>
+                    <span id="sidebar-val-spm" class="font-bold text-amber-400 font-mono">6.7 SPM</span>
                 </div>
-                <input type="range" id="slider-spm" min="4" max="12" value="7.0" step="0.5" class="w-full" oninput="updatePhysics()">
-                <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                <input type="range" id="slider-spm" min="4" max="12" value="6.7" step="0.1" oninput="updatePhysicsFromSliders()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                <div class="flex justify-between text-[10px] text-slate-500 font-mono">
                     <span>4.0</span>
-                    <span class="text-emerald-400 font-medium">5.0 - 10.0</span>
+                    <span class="text-emerald-400 font-semibold">5.0 - 10.0</span>
                     <span>12.0</span>
                 </div>
             </div>
 
-            <div class="hud-card p-4">
-                <div class="flex justify-between text-xs font-semibold mb-2">
-                    <span class="text-slate-400">Stroke Length ($S$):</span>
-                    <span class="text-amber-400 font-mono" id="val-stroke">1.55 m</span>
+            <!-- Stroke Length Slider -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-xs">
+                    <span class="text-slate-300 font-medium">Stroke Length ($S$):</span>
+                    <span id="sidebar-val-stroke" class="font-bold text-amber-400 font-mono">1.52 m</span>
                 </div>
-                <input type="range" id="slider-stroke" min="1.2" max="2.1" value="1.55" step="0.05" class="w-full" oninput="updatePhysics()">
-                <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                <input type="range" id="slider-stroke" min="1.2" max="2.1" value="1.52" step="0.01" oninput="updatePhysicsFromSliders()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                <div class="flex justify-between text-[10px] text-slate-500 font-mono">
                     <span>1.20 m</span>
                     <span>1.55 m</span>
                     <span>2.10 m</span>
                 </div>
             </div>
+
+            <!-- Feasibility Constraint Card -->
+            <div id="sidebar-feasibility-card" class="p-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-[11px] font-semibold flex items-center space-x-2">
+                <span>✅</span>
+                <span>FEASIBLE SETPOINT: All limits satisfied</span>
+            </div>
         </div>
 
-        <!-- Constraint Feasibility Banner -->
-        <div id="feasibility-banner" class="p-3.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 text-xs font-semibold flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <span class="text-base">✅</span>
-                <span>FEASIBLE SETPOINT: All prototype constraints satisfied (Load &le; 62.0 kN, Fillage &ge; 52.0%, Steam &le; 118 t).</span>
+        <!-- Prototype Disclaimer Footer -->
+        <div class="p-3 border-t border-slate-800/80 bg-slate-950/60 text-[10px] text-slate-500 leading-tight">
+            PROTOTYPE MODE • Seed 26120 • Advisory Digital Twin for Coupled CSS + SRP
+        </div>
+    </aside>
+
+    <!-- MAIN VIEWPORT: ULTRA-REALISTIC THREE.JS DECISION TWIN -->
+    <main class="flex-1 relative h-full overflow-hidden bg-[#040814]">
+        <!-- 3D WebGL Canvas Container -->
+        <div id="canvas-container"></div>
+
+        <!-- Sidebar Collapse Toggle Button -->
+        <button id="sidebar-toggle-btn" onclick="toggleSidebar()" class="absolute top-3.5 left-3.5 z-30 hud-glass px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white text-xs font-bold transition flex items-center space-x-1" title="Toggle Sidebar">
+            <span>◀</span>
+        </button>
+
+        <!-- TOP TOOLBAR & CONTROLS -->
+        <div class="absolute top-3 left-14 right-3 flex justify-between items-start pointer-events-none z-20">
+            <!-- Asset Header -->
+            <div class="hud-glass rounded-xl px-4 py-2 pointer-events-auto flex items-center space-x-3.5 shadow-xl">
+                <div class="relative flex items-center justify-center">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping absolute"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-black text-white font-mono tracking-wide">BWG-SIM-001</span>
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                            CURRENT TELEMETRY
+                        </span>
+                    </div>
+                    <div class="text-[10px] text-slate-400 font-medium hidden sm:block">Baghewala Heavy Oil • Jodhpur Sandstone Pumping Twin</div>
+                </div>
+                <div class="h-6 w-px bg-slate-700 hidden sm:block"></div>
+                <div class="text-xs hidden sm:block">
+                    <span class="text-slate-400 text-[11px]">Pumping Speed:</span>
+                    <span id="top-spm-val" class="font-bold text-amber-400 font-mono text-xs ml-1">6.7 SPM</span>
+                </div>
             </div>
-            <span class="px-2.5 py-1 rounded bg-emerald-500/20 font-mono font-bold">FEASIBLE</span>
+
+            <!-- Camera & Navigation Toolbar -->
+            <div class="hud-glass rounded-xl p-1.5 pointer-events-auto flex items-center space-x-1.5 shadow-xl">
+                <button onclick="setCameraView('surface')" class="view-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-600 text-white transition flex items-center space-x-1" id="btn-view-surface">
+                    <span>🏗️ Surface Unit</span>
+                </button>
+                <button onclick="setCameraView('pump')" class="view-btn px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/90 hover:bg-amber-600 hover:text-white text-slate-200 transition flex items-center space-x-1" id="btn-view-pump">
+                    <span class="hidden md:inline">⚙️ Downhole Pump & Valves</span>
+                    <span class="md:hidden">⚙️ Pump</span>
+                </button>
+                <button onclick="setCameraView('reservoir')" class="view-btn px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/90 hover:bg-amber-600 hover:text-white text-slate-200 transition flex items-center space-x-1" id="btn-view-res">
+                    <span class="hidden md:inline">🔥 Reservoir & Inflow</span>
+                    <span class="md:hidden">🔥 Reservoir</span>
+                </button>
+                <button onclick="setCameraView('profile')" class="view-btn px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/90 hover:bg-amber-600 hover:text-white text-slate-200 transition flex items-center space-x-1" id="btn-view-prof">
+                    <span class="hidden lg:inline">📐 Full Well Profile</span>
+                    <span class="lg:hidden">📐 Profile</span>
+                </button>
+
+                <div class="h-5 w-px bg-slate-700 mx-1"></div>
+
+                <button id="btn-auto-orbit" onclick="toggleAutoOrbit()" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 transition" title="Toggle Cinematic Auto-Orbit">
+                    🔄 Orbit
+                </button>
+                <button id="btn-labels" onclick="toggleLabels()" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 transition" title="Toggle 3D Component Labels">
+                    🏷️ Labels
+                </button>
+                <button id="btn-pause" onclick="togglePlayPause()" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 transition" title="Play / Pause Kinematics">
+                    ⏸️
+                </button>
+                <button onclick="toggleFullscreen()" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 transition" title="Toggle Fullscreen">
+                    ⛶
+                </button>
+            </div>
         </div>
 
-        <!-- Dynamic Output KPIs -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-center">
-            <div class="hud-card p-3.5">
-                <div class="text-[10px] uppercase font-bold text-slate-400">Reservoir Temp</div>
-                <div class="text-xl font-extrabold text-amber-400 font-mono mt-1" id="out-temp">62.5 °C</div>
-                <div class="text-[10px] text-slate-500 mt-0.5">dT/dt thermal model</div>
+        <!-- DYNAMIC STROKE PHASE BANNER (TOP CENTER) -->
+        <div class="absolute top-16 left-1/2 -translate-x-1/2 pointer-events-none z-20">
+            <div id="stroke-phase-banner" class="stroke-banner-up px-4 py-1.5 rounded-full text-xs font-mono font-bold tracking-wide shadow-lg transition-all duration-300 flex items-center space-x-2">
+                <span id="stroke-phase-icon">⬆️</span>
+                <span id="stroke-phase-text">UPSTROKE: Traveling Valve CLOSED (Lifting) • Standing Valve OPEN (Intake)</span>
             </div>
-            <div class="hud-card p-3.5">
-                <div class="text-[10px] uppercase font-bold text-slate-400">Heavy Oil Viscosity</div>
-                <div class="text-xl font-extrabold text-cyan-400 font-mono mt-1" id="out-visc">7.20 kcP</div>
-                <div class="text-[10px] text-slate-500 mt-0.5">d&mu;/dT &lt; 0 correlation</div>
+        </div>
+
+        <!-- LIVE TELEMETRY HUD (BOTTOM RIGHT) -->
+        <div class="absolute bottom-3 right-3 w-76 sm:w-80 hud-glass rounded-xl p-3.5 pointer-events-auto z-20 shadow-2xl">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-700/80">
+                <div class="flex items-center space-x-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                    <span class="text-xs font-bold text-slate-200 uppercase tracking-wider">Coupled Physics HUD</span>
+                </div>
+                <span id="hud-spm-tag" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                    6.7 SPM • 1.52m
+                </span>
             </div>
-            <div class="hud-card p-3.5">
-                <div class="text-[10px] uppercase font-bold text-slate-400">Net Oil Rate</div>
-                <div class="text-xl font-extrabold text-emerald-400 font-mono mt-1" id="out-oil">34.5 bpd</div>
-                <div class="text-[10px] text-slate-500 mt-0.5">Mobility inflow</div>
+
+            <div class="mt-2.5 space-y-1.5 text-xs font-mono">
+                <div class="flex justify-between items-center bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-800/80">
+                    <span class="text-slate-400">Dynamic Rod Load:</span>
+                    <span class="font-extrabold text-rose-400 text-sm flex items-center space-x-1">
+                        <span id="hud-live-load">46.2</span>
+                        <span class="text-xs text-rose-300 font-normal">kN</span>
+                    </span>
+                </div>
+
+                <div class="flex justify-between items-center bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-800/80">
+                    <span class="text-slate-400">Reservoir Temp:</span>
+                    <span class="font-bold text-amber-400 text-sm" id="hud-temp">62.5 °C</span>
+                </div>
+
+                <div class="flex justify-between items-center bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-800/80">
+                    <span class="text-slate-400">Heavy Oil Viscosity:</span>
+                    <span class="font-bold text-cyan-400 text-sm" id="hud-visc">7.20 kcP</span>
+                </div>
+
+                <div class="flex justify-between items-center bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-800/80">
+                    <span class="text-slate-400">Net Crude Rate:</span>
+                    <span class="font-bold text-emerald-400 text-sm" id="hud-oil">34.5 bpd</span>
+                </div>
+
+                <div class="flex justify-between items-center bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-800/80">
+                    <span class="text-slate-400">Pump Fillage:</span>
+                    <span class="font-bold text-blue-400 text-sm" id="hud-fillage">68.0 %</span>
+                </div>
             </div>
-            <div class="hud-card p-3.5">
-                <div class="text-[10px] uppercase font-bold text-slate-400">Polished Rod Load</div>
-                <div class="text-xl font-extrabold text-rose-400 font-mono mt-1" id="out-load">46.2 kN</div>
-                <div class="text-[10px] text-slate-500 mt-0.5">Limit: 62.0 kN</div>
+
+            <!-- Simulation Speed Selector -->
+            <div class="mt-2.5 pt-2 border-t border-slate-700/80 flex items-center justify-between text-xs text-slate-400">
+                <span class="font-semibold text-[10px]">Speed:</span>
+                <div class="flex items-center space-x-1">
+                    <button onclick="setSimSpeed(0.25)" class="speed-btn px-2 py-0.5 rounded text-[10px] bg-slate-800 hover:bg-amber-600 text-slate-300">0.25x</button>
+                    <button onclick="setSimSpeed(0.5)" class="speed-btn px-2 py-0.5 rounded text-[10px] bg-slate-800 hover:bg-amber-600 text-slate-300">0.5x</button>
+                    <button onclick="setSimSpeed(1.0)" class="speed-btn px-2 py-0.5 rounded text-[10px] bg-amber-600 text-white font-bold" id="speed-1">1.0x</button>
+                    <button onclick="setSimSpeed(2.0)" class="speed-btn px-2 py-0.5 rounded text-[10px] bg-slate-800 hover:bg-amber-600 text-slate-300">2.0x</button>
+                </div>
             </div>
-            <div class="hud-card p-3.5">
-                <div class="text-[10px] uppercase font-bold text-slate-400">Pump Fillage</div>
-                <div class="text-xl font-extrabold text-blue-400 font-mono mt-1" id="out-fillage">68.0 %</div>
-                <div class="text-[10px] text-slate-500 mt-0.5">Threshold &ge; 52.0%</div>
+        </div>
+
+        <!-- ENGINEERING INSPECTION CARD (BOTTOM LEFT) -->
+        <div id="inspector-card" class="absolute bottom-3 left-3 w-80 sm:w-88 hud-glass rounded-xl p-3.5 pointer-events-auto z-20 max-w-sm transition-all duration-300 shadow-2xl">
+            <div class="flex justify-between items-start mb-1.5 pb-1.5 border-b border-slate-700/70">
+                <div>
+                    <div class="text-[9px] font-bold text-amber-400 uppercase tracking-wider">Component Inspector</div>
+                    <div id="insp-title" class="text-xs sm:text-sm font-extrabold text-white">Sucker Rod Pumping Unit</div>
+                </div>
+                <span id="insp-badge" class="px-2 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                    SURFACE
+                </span>
             </div>
+            <p id="insp-desc" class="text-[11px] text-slate-300 leading-relaxed">
+                API Conventional Class I beam unit converting rotary motion into reciprocating polished rod stroke via Samson post, walking beam, and counterweighted crank.
+            </p>
+            <div id="insp-stats" class="mt-2 p-2 rounded bg-slate-900/80 border border-slate-800 text-[10px] font-mono space-y-0.5 text-slate-300">
+                <div>• <b>Cadence:</b> 6.7 SPM (1.52 m stroke)</div>
+                <div>• <b>Peak Rod Load:</b> 46.2 kN (Max 62.0 kN)</div>
+            </div>
+            <div class="mt-1.5 text-[9px] text-slate-400 italic">
+                💡 Click any 3D part or label pin to inspect engineering details.
+            </div>
+        </div>
+
+        <!-- 3D PINS CONTAINER -->
+        <div id="pins-container" class="absolute inset-0 pointer-events-none z-10" style="display: none;">
+            <div id="pin-horsehead" class="annotation-pin" onclick="inspectPart('horsehead')">🐴 Horsehead & Bridle</div>
+            <div id="pin-beam" class="annotation-pin" onclick="inspectPart('walkingBeam')">⚖️ Walking Beam</div>
+            <div id="pin-sampson" class="annotation-pin" onclick="inspectPart('sampsonPost')">🏗️ Samson Post</div>
+            <div id="pin-crank" class="annotation-pin" onclick="inspectPart('crank')">⚙️ Crank & Weights</div>
+            <div id="pin-wellhead" class="annotation-pin" onclick="inspectPart('stuffingBox')">🛢️ Stuffing Box</div>
+            <div id="pin-reservoir" class="annotation-pin" onclick="inspectPart('reservoir')">🔥 Jodhpur Sandstone</div>
+            <div id="pin-pump" class="annotation-pin" onclick="inspectPart('downholePump')">⚙️ Downhole Pump</div>
         </div>
     </main>
 
-    <!-- FOOTER WITH PROVENANCE -->
-    <footer class="border-t border-slate-800 bg-slate-900/60 px-6 py-4 text-xs text-slate-400 flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
-        <div>
-            <b>THERMOLIFT / MaruDhara</b> • SIH26120 Oil India Limited Prototype • Reproducible Seed <b>26120</b>
-        </div>
-        <div class="font-mono text-[11px] text-slate-500">
-            Chronological Validation MAE: 4.82°C | Monotonicity: d&mu;/dT &lt; 0 | Netlify Ready
-        </div>
-    </footer>
-
-    <!-- EMBEDDED THREE.JS SCRIPT -->
+    <!-- CORE THREE.JS ENGINE SCRIPT -->
     <script>
-        // State variables
-        let currentSteam = 110.0;
-        let currentSoak = 48.0;
-        let currentSPM = 7.0;
-        let currentStroke = 1.55;
 
-        let curTemp = 62.5;
-        let curVisc = 7.20;
-        let curOil = 34.5;
-        let curLoad = 46.2;
-        let curFillage = 68.0;
+        const stateData = {"well_id": "BWG-SIM-001", "temperature_c": 62.5, "viscosity_kcp": 7.2, "spm": 6.7, "stroke_m": 1.52, "oil_rate_bpd": 34.5, "pump_fillage_pct": 68.0, "srp_load_kn": 46.2, "risk_score": 18.0, "phase": "production", "scenario_label": "CURRENT TELEMETRY"};
 
-        // --- PROCEDURAL TEXTURES ---
+        // --- PROCEDURAL ENVIRONMENT & TEXTURE GENERATOR ---
         function createDesertEnvMap() {
             const c = document.createElement('canvas');
-            c.width = 1024; c.height = 512;
+            c.width = 1024;
+            c.height = 512;
             const ctx = c.getContext('2d');
+
+            // Sky to horizon gradient
             const grad = ctx.createLinearGradient(0, 0, 0, 512);
-            grad.addColorStop(0.0, '#0f172a');
-            grad.addColorStop(0.35, '#1e3a8a');
-            grad.addColorStop(0.48, '#fbbf24');
-            grad.addColorStop(0.52, '#d97706');
-            grad.addColorStop(0.7, '#78350f');
-            grad.addColorStop(1.0, '#0f172a');
+            grad.addColorStop(0.0, '#0f172a');  // dark sky zenith
+            grad.addColorStop(0.35, '#1e3a8a'); // desert sky blue
+            grad.addColorStop(0.48, '#fbbf24'); // golden horizon light
+            grad.addColorStop(0.52, '#d97706'); // desert sand line
+            grad.addColorStop(0.7, '#78350f');  // desert ground
+            grad.addColorStop(1.0, '#0f172a');  // subterranean
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, 1024, 512);
 
+            // Sun highlight
             ctx.beginPath();
             ctx.arc(720, 190, 50, 0, Math.PI * 2);
             ctx.fillStyle = '#ffffff';
             ctx.shadowColor = '#fef08a';
             ctx.shadowBlur = 80;
             ctx.fill();
+            ctx.shadowBlur = 0;
 
             const tex = new THREE.CanvasTexture(c);
             tex.mapping = THREE.EquirectangularReflectionMapping;
@@ -361,41 +450,97 @@
 
         function createBrushedSteelCanvas() {
             const c = document.createElement('canvas');
-            c.width = 512; c.height = 512;
+            c.width = 512;
+            c.height = 512;
             const ctx = c.getContext('2d');
             ctx.fillStyle = '#64748b';
             ctx.fillRect(0, 0, 512, 512);
-            for (let i = 0; i < 4000; i++) {
+            for (let i = 0; i < 5000; i++) {
                 const y = Math.random() * 512;
                 const len = 30 + Math.random() * 140;
+                const x = Math.random() * 512;
                 ctx.fillStyle = (Math.random() > 0.5) ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.14)';
-                ctx.fillRect(Math.random() * 512, y, len, 1.2);
+                ctx.fillRect(x, y, len, 1.2);
             }
             return new THREE.CanvasTexture(c);
         }
 
         function createHazardStripesCanvas() {
             const c = document.createElement('canvas');
-            c.width = 256; c.height = 256;
+            c.width = 256;
+            c.height = 256;
             const ctx = c.getContext('2d');
-            ctx.fillStyle = '#f59e0b';
+            ctx.fillStyle = '#f59e0b'; // amber
             ctx.fillRect(0, 0, 256, 256);
-            ctx.fillStyle = '#0f172a';
+            ctx.fillStyle = '#0f172a'; // dark slate
             for (let i = -256; i < 512; i += 44) {
                 ctx.beginPath();
-                ctx.moveTo(i, 0); ctx.lineTo(i + 22, 0);
-                ctx.lineTo(i + 22 - 128, 256); ctx.lineTo(i - 128, 256);
-                ctx.closePath(); ctx.fill();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i + 22, 0);
+                ctx.lineTo(i + 22 - 128, 256);
+                ctx.lineTo(i - 128, 256);
+                ctx.closePath();
+                ctx.fill();
             }
             const tex = new THREE.CanvasTexture(c);
-            tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
             tex.repeat.set(2, 2);
+            return tex;
+        }
+
+        function createSandNormalCanvas() {
+            const c = document.createElement('canvas');
+            c.width = 512;
+            c.height = 512;
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#b45309';
+            ctx.fillRect(0, 0, 512, 512);
+            for (let i = 0; i < 20000; i++) {
+                const x = Math.random() * 512;
+                const y = Math.random() * 512;
+                ctx.fillStyle = Math.random() > 0.5 ? 'rgba(251,191,36,0.18)' : 'rgba(120,53,15,0.18)';
+                ctx.fillRect(x, y, 2, 2);
+            }
+            // ripple dunes
+            ctx.strokeStyle = 'rgba(217, 119, 6, 0.35)';
+            ctx.lineWidth = 5;
+            for (let y = 20; y < 512; y += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.bezierCurveTo(150, y + 25, 360, y - 20, 512, y + 10);
+                ctx.stroke();
+            }
+            const tex = new THREE.CanvasTexture(c);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(4, 4);
+            return tex;
+        }
+
+        function createRockStrataCanvas() {
+            const c = document.createElement('canvas');
+            c.width = 512;
+            c.height = 512;
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, 0, 512, 512);
+            for (let y = 0; y < 512; y += 6) {
+                const val = 18 + Math.floor(Math.sin(y * 0.08) * 12 + Math.random() * 8);
+                ctx.fillStyle = `rgb(${val}, ${val + 8}, ${val + 16})`;
+                ctx.fillRect(0, y, 512, 5);
+            }
+            const tex = new THREE.CanvasTexture(c);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(2, 6);
             return tex;
         }
 
         function createPerforatedCasingCanvas() {
             const c = document.createElement('canvas');
-            c.width = 256; c.height = 512;
+            c.width = 256;
+            c.height = 512;
             const ctx = c.getContext('2d');
             ctx.fillStyle = '#64748b';
             ctx.fillRect(0, 0, 256, 512);
@@ -406,21 +551,25 @@
                     ctx.beginPath();
                     ctx.arc(x + ox, y, 5, 0, Math.PI * 2);
                     ctx.fill();
-                    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1.2; ctx.stroke();
+                    ctx.strokeStyle = '#e2e8f0';
+                    ctx.lineWidth = 1.2;
+                    ctx.stroke();
                 }
             }
             const tex = new THREE.CanvasTexture(c);
-            tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
             tex.repeat.set(2, 4);
             return tex;
         }
 
-        // --- THREE.JS SCENE SETUP ---
+        // --- THREE.JS INITIALIZATION ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x040814);
         scene.fog = new THREE.FogExp2(0x040814, 0.0028);
 
+        // High-scale camera framing
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1500);
         camera.position.set(13.5, 9.5, 16.5);
 
@@ -440,12 +589,21 @@
         controls.enableDamping = true;
         controls.dampingFactor = 0.06;
         controls.maxPolarAngle = Math.PI / 2 + 0.42;
-        controls.target.set(-2.8, 4.8, 0);
+        controls.target.set(-2.5, 4.5, 0);
 
         // --- LIGHTING ---
         const sunLight = new THREE.DirectionalLight(0xfff8ed, 2.8);
         sunLight.position.set(40, 60, 30);
         sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+        sunLight.shadow.camera.near = 1;
+        sunLight.shadow.camera.far = 200;
+        sunLight.shadow.camera.left = -30;
+        sunLight.shadow.camera.right = 30;
+        sunLight.shadow.camera.top = 30;
+        sunLight.shadow.camera.bottom = -30;
+        sunLight.shadow.bias = -0.0004;
         scene.add(sunLight);
 
         const hemiLight = new THREE.HemisphereLight(0x38bdf8, 0x1e293b, 0.8);
@@ -454,101 +612,258 @@
         const ambientLight = new THREE.AmbientLight(0x0f172a, 0.95);
         scene.add(ambientLight);
 
-        const reservoirLight = new THREE.PointLight(0xf59e0b, 5.5, 80);
+        // Subsurface Thermal Glow Point Light
+        function getThermalColor(temp) {
+            const norm = Math.max(0, Math.min(1, (temp - 48) / 36));
+            const color = new THREE.Color();
+            color.setHSL(0.03 + norm * 0.08, 0.98, 0.44 + norm * 0.35);
+            return color;
+        }
+        const thermalGlowColor = getThermalColor(stateData.temperature_c);
+
+        const reservoirLight = new THREE.PointLight(thermalGlowColor, 5.5, 80);
         reservoirLight.position.set(0, -56, 0);
         scene.add(reservoirLight);
 
-        // --- MATERIALS ---
+        // --- PBR TEXTURES & MATERIALS ---
         const steelMap = createBrushedSteelCanvas();
         const hazardMap = createHazardStripesCanvas();
+        const sandMap = createSandNormalCanvas();
+        const strataMap = createRockStrataCanvas();
         const perfMap = createPerforatedCasingCanvas();
 
         const matSteel = new THREE.MeshStandardMaterial({
-            color: 0x475569, metalness: 0.9, roughness: 0.25,
-            map: steelMap, bumpMap: steelMap, bumpScale: 0.05, envMap: envMap
+            color: 0x475569,
+            metalness: 0.9,
+            roughness: 0.25,
+            map: steelMap,
+            bumpMap: steelMap,
+            bumpScale: 0.05,
+            envMap: envMap
         });
-        const matYellowFrame = new THREE.MeshStandardMaterial({ color: 0xeab308, metalness: 0.65, roughness: 0.32, envMap: envMap });
-        const matCounterweight = new THREE.MeshStandardMaterial({ color: 0x9a3412, metalness: 0.82, roughness: 0.28, bumpMap: steelMap, bumpScale: 0.08, envMap: envMap });
-        const matHazard = new THREE.MeshStandardMaterial({ map: hazardMap, metalness: 0.5, roughness: 0.4 });
-        const matChrome = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.98, roughness: 0.05, envMap: envMap });
-        const matSand = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.95, metalness: 0.02 });
-        const matShale = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.88, metalness: 0.1 });
-        const matReservoir = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.6, metalness: 0.25, emissive: 0xf59e0b, emissiveIntensity: 0.52 });
-        const matPerfCasing = new THREE.MeshStandardMaterial({ map: perfMap, metalness: 0.85, roughness: 0.35, transparent: true, opacity: 0.85 });
-        const matGlassTubing = new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.1, roughness: 0.05, transparent: true, opacity: 0.4 });
 
-        // --- MESH HIERARCHY ---
-        // 1. Terrain & Subsurface
+        const matYellowFrame = new THREE.MeshStandardMaterial({
+            color: 0xeab308,
+            metalness: 0.65,
+            roughness: 0.32,
+            envMap: envMap
+        });
+
+        const matCounterweight = new THREE.MeshStandardMaterial({
+            color: 0x9a3412,
+            metalness: 0.82,
+            roughness: 0.28,
+            bumpMap: steelMap,
+            bumpScale: 0.08,
+            envMap: envMap
+        });
+
+        const matHazardStripe = new THREE.MeshStandardMaterial({
+            map: hazardMap,
+            metalness: 0.5,
+            roughness: 0.4
+        });
+
+        const matPolishedChrome = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            metalness: 0.98,
+            roughness: 0.05,
+            envMap: envMap
+        });
+
+        const matDesertSand = new THREE.MeshStandardMaterial({
+            map: sandMap,
+            roughness: 0.95,
+            metalness: 0.02
+        });
+
+        const matShaleCaprock = new THREE.MeshStandardMaterial({
+            map: strataMap,
+            roughness: 0.88,
+            metalness: 0.1
+        });
+
+        const matReservoir = new THREE.MeshStandardMaterial({
+            color: thermalGlowColor,
+            roughness: 0.6,
+            metalness: 0.25,
+            emissive: thermalGlowColor,
+            emissiveIntensity: 0.52
+        });
+
+        const matPerforatedCasing = new THREE.MeshStandardMaterial({
+            map: perfMap,
+            metalness: 0.85,
+            roughness: 0.35,
+            transparent: true,
+            opacity: 0.85
+        });
+
+        const matGlassTubing = new THREE.MeshStandardMaterial({
+            color: 0x38bdf8,
+            metalness: 0.1,
+            roughness: 0.05,
+            transparent: true,
+            opacity: 0.4
+        });
+
+        // --- INTERACTIVE RAYCASTING FOR INSPECTION ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const inspectableObjects = [];
+
+        function registerInspectable(mesh, partKey) {
+            mesh.userData.partKey = partKey;
+            inspectableObjects.push(mesh);
+        }
+
+        // --- 1. DESERT GROUND & STRATIGRAPHY CUTAWAY ---
         const terrainGroup = new THREE.Group();
-        const surfacePad = new THREE.Mesh(new THREE.BoxGeometry(64, 1.0, 64), matSand);
-        surfacePad.position.y = -0.5; surfacePad.receiveShadow = true;
+
+        // Surface pad
+        const surfacePadGeo = new THREE.BoxGeometry(64, 1.0, 64);
+        const surfacePad = new THREE.Mesh(surfacePadGeo, matDesertSand);
+        surfacePad.position.y = -0.5;
+        surfacePad.receiveShadow = true;
         terrainGroup.add(surfacePad);
 
-        const cellarPad = new THREE.Mesh(new THREE.BoxGeometry(17, 0.4, 13), new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.9 }));
-        cellarPad.position.set(-2.5, 0.05, 0); cellarPad.receiveShadow = true;
-        terrainGroup.add(cellarPad);
+        // Concrete well cellar pad
+        const cellarGeo = new THREE.BoxGeometry(17, 0.4, 13);
+        const cellarMesh = new THREE.Mesh(cellarGeo, new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.9 }));
+        cellarMesh.position.set(-2.5, 0.05, 0);
+        cellarMesh.receiveShadow = true;
+        terrainGroup.add(cellarMesh);
 
-        const obMesh = new THREE.Mesh(new THREE.BoxGeometry(28, 24, 28), new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.9 }));
+        // Subsurface Cutaway Overburden (0 to -24m)
+        const obGeo = new THREE.BoxGeometry(28, 24, 28);
+        const obMesh = new THREE.Mesh(obGeo, new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.9 }));
         obMesh.position.set(-14, -12, -14);
         terrainGroup.add(obMesh);
 
-        const shaleMesh = new THREE.Mesh(new THREE.BoxGeometry(28, 22, 28), matShale);
+        // Impermeable Caprock Shale (-24 to -46m)
+        const shaleGeo = new THREE.BoxGeometry(28, 22, 28);
+        const shaleMesh = new THREE.Mesh(shaleGeo, matShaleCaprock);
         shaleMesh.position.set(-14, -35, -14);
         terrainGroup.add(shaleMesh);
 
-        const resMesh = new THREE.Mesh(new THREE.CylinderGeometry(20, 22, 26, 32), matReservoir);
+        // Jodhpur Sandstone Heavy Oil Reservoir (-46 to -72m)
+        const resGeo = new THREE.CylinderGeometry(20, 22, 26, 32);
+        const resMesh = new THREE.Mesh(resGeo, matReservoir);
         resMesh.position.set(0, -59, 0);
+        registerInspectable(resMesh, 'reservoir');
         terrainGroup.add(resMesh);
+
         scene.add(terrainGroup);
 
-        // 2. Wellhead & Tubulars
+        // --- 2. WELLHEAD & DOWNHOLE TUBULARS ---
         const wellGroup = new THREE.Group();
+
+        // Wellhead Master Valve & Flange
         const flange = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.85, 0.9, 20), matSteel);
-        flange.position.y = 0.45; wellGroup.add(flange);
+        flange.position.y = 0.45;
+        flange.castShadow = true;
+        wellGroup.add(flange);
 
+        // Master valve handwheel
+        const wheelGeo = new THREE.TorusGeometry(0.35, 0.05, 12, 24);
+        const wheel = new THREE.Mesh(wheelGeo, matHazardStripe);
+        wheel.position.set(0.65, 0.65, 0);
+        wheel.rotation.y = Math.PI / 2;
+        wellGroup.add(wheel);
+
+        // Stuffing Box
         const stuffingBox = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.38, 1.4, 20), matSteel);
-        stuffingBox.position.y = 1.4; wellGroup.add(stuffingBox);
+        stuffingBox.position.y = 1.4;
+        stuffingBox.castShadow = true;
+        registerInspectable(stuffingBox, 'stuffingBox');
+        wellGroup.add(stuffingBox);
 
-        const casingMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 68, 32, 1, true), matPerfCasing);
-        casingMesh.position.y = -34; wellGroup.add(casingMesh);
+        // Surface Flowline leading to manifold
+        const flowline = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 10, 16), matYellowFrame);
+        flowline.rotation.z = Math.PI / 2;
+        flowline.position.set(5.2, 1.0, 0);
+        wellGroup.add(flowline);
 
-        const tubingMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.48, 66, 24), matGlassTubing);
-        tubingMesh.position.y = -33; wellGroup.add(tubingMesh);
+        // Subsurface Casing string
+        const casingGeo = new THREE.CylinderGeometry(0.95, 0.95, 68, 32, 1, true);
+        const casingMesh = new THREE.Mesh(casingGeo, matPerforatedCasing);
+        casingMesh.position.y = -34;
+        wellGroup.add(casingMesh);
 
-        const suckerRod = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 70.0, 12), matChrome);
-        suckerRod.position.y = -35.0 + 2.5; wellGroup.add(suckerRod);
+        // Production Tubing (Inner transparent glass tube)
+        const tubingGeo = new THREE.CylinderGeometry(0.48, 0.48, 66, 24);
+        const tubingMesh = new THREE.Mesh(tubingGeo, matGlassTubing);
+        tubingMesh.position.y = -33;
+        registerInspectable(tubingMesh, 'tubing');
+        wellGroup.add(tubingMesh);
 
-        // Downhole Pump at -56m
+        // Sucker Rod String
+        const totalRodLength = 70.0;
+        const suckerRodGeo = new THREE.CylinderGeometry(0.08, 0.08, totalRodLength, 12);
+        const suckerRod = new THREE.Mesh(suckerRodGeo, matPolishedChrome);
+        suckerRod.position.y = -totalRodLength / 2 + 2.5;
+        wellGroup.add(suckerRod);
+
+        // DOWNHOLE PUMP CUTAWAY (-56m depth)
         const pumpGroup = new THREE.Group();
         pumpGroup.position.y = -56.0;
 
+        // Stationary Pump Barrel
         const barrelMesh = new THREE.Mesh(
             new THREE.CylinderGeometry(0.44, 0.44, 5.2, 24, 1, true),
             new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.85, roughness: 0.25, transparent: true, opacity: 0.65 })
         );
+        registerInspectable(barrelMesh, 'downholePump');
         pumpGroup.add(barrelMesh);
 
-        const svBall = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), matChrome);
-        svBall.position.set(0, -2.15, 0); pumpGroup.add(svBall);
+        // Standing Valve Assembly
+        const svSeat = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.35, 16), matSteel);
+        svSeat.position.y = -2.35;
+        pumpGroup.add(svSeat);
 
+        const svBall = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), matPolishedChrome);
+        svBall.position.set(0, -2.15, 0);
+        registerInspectable(svBall, 'standingValve');
+        pumpGroup.add(svBall);
+
+        // Reciprocating Plunger
         const plungerGroup = new THREE.Group();
         const plungerBody = new THREE.Mesh(new THREE.CylinderGeometry(0.37, 0.37, 3.5, 20), matSteel);
         plungerGroup.add(plungerBody);
 
-        const tvBall = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), matChrome);
-        tvBall.position.set(0, -1.25, 0); plungerGroup.add(tvBall);
+        // Traveling Valve Assembly inside plunger
+        const tvSeat = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.25, 16), matSteel);
+        tvSeat.position.y = -1.4;
+        plungerGroup.add(tvSeat);
+
+        const tvBall = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), matPolishedChrome);
+        tvBall.position.set(0, -1.25, 0);
+        registerInspectable(tvBall, 'travelingValve');
+        plungerGroup.add(tvBall);
 
         pumpGroup.add(plungerGroup);
         wellGroup.add(pumpGroup);
+
         scene.add(wellGroup);
 
-        // 3. Sucker Rod Pump (Class I Nodding Donkey)
+        // --- 3. SUCKER ROD PUMPING UNIT (PUMPJACK) ---
+        // Wellhead centerline at X = 0.
+        // Horsehead arc radius = 4.6. Sampson center at X = -4.6, Y = 7.6.
         const pumpjack = new THREE.Group();
-        const skid = new THREE.Mesh(new THREE.BoxGeometry(14.0, 0.55, 4.4), matYellowFrame);
-        skid.position.set(-6.8, 0.27, 0); pumpjack.add(skid);
 
+        // Heavy Base Skid
+        const skidGeo = new THREE.BoxGeometry(14.0, 0.55, 4.4);
+        const skid = new THREE.Mesh(skidGeo, matYellowFrame);
+        skid.position.set(-6.8, 0.27, 0);
+        skid.castShadow = true;
+        skid.receiveShadow = true;
+        pumpjack.add(skid);
+
+        // Structural Sampson Post
         const sampsonCenter = new THREE.Vector3(-4.6, 7.6, 0);
         const postGroup = new THREE.Group();
+
+        const legGeom = new THREE.CylinderGeometry(0.18, 0.26, 7.8, 12);
         const legPositions = [
             { x: -4.6 + 1.2, z: 1.4, rx: -0.16, rz: -0.14 },
             { x: -4.6 + 1.2, z: -1.4, rx: 0.16, rz: -0.14 },
@@ -556,56 +871,98 @@
             { x: -4.6 - 1.8, z: -1.4, rx: 0.16, rz: 0.22 }
         ];
         legPositions.forEach(p => {
-            const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.26, 7.8, 12), matSteel);
+            const leg = new THREE.Mesh(legGeom, matSteel);
             leg.position.set(p.x, 3.8, p.z);
-            leg.rotation.x = p.rx; leg.rotation.z = p.rz;
+            leg.rotation.x = p.rx;
+            leg.rotation.z = p.rz;
+            leg.castShadow = true;
             postGroup.add(leg);
         });
 
+        // Cross braces
+        const braceGeo = new THREE.CylinderGeometry(0.08, 0.08, 2.6, 8);
+        const brace1 = new THREE.Mesh(braceGeo, matSteel);
+        brace1.position.set(-4.6, 3.6, 0);
+        brace1.rotation.x = Math.PI / 2;
+        postGroup.add(brace1);
+
+        // Center Bearing Housing (Saddle Bearing)
         const centerBearing = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 1.8, 20), matSteel);
         centerBearing.rotation.x = Math.PI / 2;
         centerBearing.position.copy(sampsonCenter);
+        centerBearing.castShadow = true;
         postGroup.add(centerBearing);
+
+        registerInspectable(centerBearing, 'sampsonPost');
         pumpjack.add(postGroup);
 
-        // Walking beam
+        // WALKING BEAM & HORSEHEAD
         const beamPivotGroup = new THREE.Group();
         beamPivotGroup.position.copy(sampsonCenter);
 
         const frontArm = 4.6;
         const rearArm = 4.4;
-        const beamMesh = new THREE.Mesh(new THREE.BoxGeometry(frontArm + rearArm, 0.8, 0.6), matSteel);
+        const totalBeamLen = frontArm + rearArm;
+        const beamMesh = new THREE.Mesh(new THREE.BoxGeometry(totalBeamLen, 0.8, 0.6), matSteel);
         beamMesh.position.set((frontArm - rearArm) / 2, 0, 0);
+        beamMesh.castShadow = true;
+        registerInspectable(beamMesh, 'walkingBeam');
         beamPivotGroup.add(beamMesh);
 
-        // Horsehead
+        // Horsehead attached to front of beam
         const horseheadGroup = new THREE.Group();
         horseheadGroup.position.set(frontArm, 0, 0);
-        const neckMesh = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.4, 0.5), matSteel);
-        neckMesh.position.set(-0.5, 0.9, 0); horseheadGroup.add(neckMesh);
 
-        const horseheadArc = new THREE.Mesh(
-            new THREE.CylinderGeometry(frontArm, frontArm, 0.6, 32, 1, false, 0, Math.PI / 2.4),
-            matHazard
-        );
+        const neckMesh = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.4, 0.5), matSteel);
+        neckMesh.position.set(-0.5, 0.9, 0);
+        neckMesh.castShadow = true;
+        horseheadGroup.add(neckMesh);
+
+        // Curved Horsehead Arc (Radius = frontArm = 4.6)
+        const arcGeom = new THREE.CylinderGeometry(frontArm, frontArm, 0.6, 32, 1, false, 0, Math.PI / 2.4);
+        const horseheadArc = new THREE.Mesh(arcGeom, matHazardStripe);
         horseheadArc.rotation.z = Math.PI / 1.18;
         horseheadArc.position.set(-frontArm, 0, 0);
+        horseheadArc.castShadow = true;
+        registerInspectable(horseheadArc, 'horsehead');
         horseheadGroup.add(horseheadArc);
+
         beamPivotGroup.add(horseheadGroup);
+
+        // Rear Equalizer Pin
+        const rearPivotLocalX = -rearArm;
+        const rearPin = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 2.2, 16), matSteel);
+        rearPin.rotation.x = Math.PI / 2;
+        rearPin.position.set(rearPivotLocalX, 0, 0);
+        beamPivotGroup.add(rearPin);
 
         pumpjack.add(beamPivotGroup);
 
-        // Rotary Crank & Counterweights
+        // ROTARY CRANK & COUNTERWEIGHTS
         const crankCenter = new THREE.Vector3(-9.2, 2.4, 0);
         const crankRadius = 1.45;
         const pitmanLen = 5.6;
 
+        // Double-reduction Gearbox
         const gearbox = new THREE.Mesh(new THREE.BoxGeometry(2.6, 2.4, 2.5), matSteel);
         gearbox.position.copy(crankCenter);
+        gearbox.castShadow = true;
         pumpjack.add(gearbox);
 
+        // Prime mover motor
+        const motorMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.65, 1.8, 16), matYellowFrame);
+        motorMesh.rotation.z = Math.PI / 2;
+        motorMesh.position.set(crankCenter.x - 2.2, 1.2, 0);
+        motorMesh.castShadow = true;
+        pumpjack.add(motorMesh);
+
+        // Crank Assembly Group
         const crankGroup = new THREE.Group();
         crankGroup.position.copy(crankCenter);
+
+        const crankshaft = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 3.8, 20), matSteel);
+        crankshaft.rotation.x = Math.PI / 2;
+        crankGroup.add(crankshaft);
 
         for (let side of [-1.9, 1.9]) {
             const crankArm = new THREE.Mesh(new THREE.BoxGeometry(0.4, crankRadius * 2.1, 0.35), matSteel);
@@ -614,184 +971,275 @@
 
             const weightSlab = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.8, 0.6), matCounterweight);
             weightSlab.position.set(0, -crankRadius * 0.75, side);
+            weightSlab.castShadow = true;
+            registerInspectable(weightSlab, 'crank');
             crankGroup.add(weightSlab);
+
+            const rimMesh = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.25, 0.65), matHazardStripe);
+            rimMesh.position.set(0, -crankRadius * 0.75 - 0.9, side);
+            crankGroup.add(rimMesh);
         }
+
         pumpjack.add(crankGroup);
 
-        // Pitman arms & Bridle
+        // Pitman Arms
         const pitman1 = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, pitmanLen, 12), matSteel);
-        const pitman2 = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, pitmanLen, 12), matSteel);
-        scene.add(pitman1); scene.add(pitman2);
+        pitman1.castShadow = true;
+        scene.add(pitman1);
 
-        const bridleMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 3.8, 8), matChrome);
+        const pitman2 = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, pitmanLen, 12), matSteel);
+        pitman2.castShadow = true;
+        scene.add(pitman2);
+
+        // Bridle Wirelines & Carrier Bar
+        const bridleMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 3.8, 8), matPolishedChrome);
+        scene.add(bridleMesh);
+
         const carrierBar = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 1.2), matYellowFrame);
-        scene.add(bridleMesh); scene.add(carrierBar);
+        carrierBar.castShadow = true;
+        scene.add(carrierBar);
 
         scene.add(pumpjack);
 
-        // Particles
-        const steamCount = 350;
+        // --- 4. MULTI-PHYSICS PARTICLES ---
+        // Steam pore dispersion
+        const steamCount = 450;
         const steamGeo = new THREE.BufferGeometry();
-        const steamPos = new Float32Array(steamCount * 3);
+        const steamPositions = new Float32Array(steamCount * 3);
         const steamVels = [];
         for (let i = 0; i < steamCount; i++) {
             const rad = Math.random() * 18;
-            const th = Math.random() * Math.PI * 2;
-            steamPos[i * 3] = rad * Math.cos(th);
-            steamPos[i * 3 + 1] = -50 - Math.random() * 20;
-            steamPos[i * 3 + 2] = rad * Math.sin(th);
-            steamVels.push({ vx: (Math.random() - 0.5) * 0.04, vy: 0.04 + Math.random() * 0.08, vz: (Math.random() - 0.5) * 0.04 });
+            const theta = Math.random() * Math.PI * 2;
+            steamPositions[i * 3] = rad * Math.cos(theta);
+            steamPositions[i * 3 + 1] = -50 - Math.random() * 20;
+            steamPositions[i * 3 + 2] = rad * Math.sin(theta);
+            steamVels.push({
+                vx: (Math.random() - 0.5) * 0.05,
+                vy: 0.05 + Math.random() * 0.1,
+                vz: (Math.random() - 0.5) * 0.05
+            });
         }
-        steamGeo.setAttribute('position', new THREE.BufferAttribute(steamPos, 3));
-        const steamMat = new THREE.PointsMaterial({ color: 0xffedd5, size: 0.85, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending });
+        steamGeo.setAttribute('position', new THREE.BufferAttribute(steamPositions, 3));
+        const steamMat = new THREE.PointsMaterial({
+            color: 0xffedd5,
+            size: 0.9,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
         const steamParticles = new THREE.Points(steamGeo, steamMat);
         scene.add(steamParticles);
 
-        const oilCount = 140;
+        // Rising crude oil droplets
+        const oilCount = 180;
         const oilGeo = new THREE.BufferGeometry();
-        const oilPos = new Float32Array(oilCount * 3);
+        const oilPositions = new Float32Array(oilCount * 3);
         for (let i = 0; i < oilCount; i++) {
             const ang = Math.random() * Math.PI * 2;
             const r = Math.random() * 0.38;
-            oilPos[i * 3] = r * Math.cos(ang);
-            oilPos[i * 3 + 1] = -60 + Math.random() * 62;
-            oilPos[i * 3 + 2] = r * Math.sin(ang);
+            oilPositions[i * 3] = r * Math.cos(ang);
+            oilPositions[i * 3 + 1] = -60 + Math.random() * 62;
+            oilPositions[i * 3 + 2] = r * Math.sin(ang);
         }
-        oilGeo.setAttribute('position', new THREE.BufferAttribute(oilPos, 3));
-        const oilMat = new THREE.PointsMaterial({ color: 0x09090b, size: 0.44, transparent: true, opacity: 0.95 });
+        oilGeo.setAttribute('position', new THREE.BufferAttribute(oilPositions, 3));
+        const oilMat = new THREE.PointsMaterial({
+            color: 0x09090b,
+            size: 0.44,
+            transparent: true,
+            opacity: 0.95
+        });
         const oilParticles = new THREE.Points(oilGeo, oilMat);
         scene.add(oilParticles);
 
-        // --- KINEMATICS LOOP ---
-        let crankAngle = 0;
+        // --- KINEMATIC SOLVER & ANIMATION LOOP ---
+        let simulationSpeed = 1.0;
         let isPaused = false;
+        let isAutoOrbit = false;
         let showLabels = false;
+
+        const spm = stateData.spm;
+        const baseOmega = (spm * 2 * Math.PI) / 60.0;
+        const strokeM = stateData.stroke_m;
+
+        let crankAngle = 0;
         const clock = new THREE.Clock();
 
-        function solveLinkage(theta) {
-            const cpLocal = new THREE.Vector3(crankRadius * Math.sin(theta), -crankRadius * Math.cos(theta), 0);
-            const cpWorld = cpLocal.clone().add(crankCenter);
-            let thetaB = -(crankRadius / rearArm) * Math.sin(theta);
+        function solveLinkage(thetaCrank) {
+            const crankPinLocal = new THREE.Vector3(
+                crankRadius * Math.sin(thetaCrank),
+                -crankRadius * Math.cos(thetaCrank),
+                0
+            );
+            const crankPinWorld = crankPinLocal.clone().add(crankCenter);
+
+            let thetaB = -(crankRadius / rearArm) * Math.sin(thetaCrank);
             for (let iter = 0; iter < 3; iter++) {
-                const rw = new THREE.Vector3(sampsonCenter.x - rearArm * Math.cos(thetaB), sampsonCenter.y - rearArm * Math.sin(thetaB), 0);
-                thetaB += (rw.distanceTo(cpWorld) - pitmanLen) * 0.05;
+                const rearWorld = new THREE.Vector3(
+                    sampsonCenter.x - rearArm * Math.cos(thetaB),
+                    sampsonCenter.y - rearArm * Math.sin(thetaB),
+                    0
+                );
+                const dist = rearWorld.distanceTo(crankPinWorld);
+                const err = dist - pitmanLen;
+                thetaB += err * 0.05;
             }
-            return { cpWorld, thetaB };
+
+            return {
+                crankPinWorld,
+                thetaB
+            };
         }
 
         function animate() {
             requestAnimationFrame(animate);
+
             const dt = clock.getDelta();
 
             if (!isPaused) {
-                const omega = (currentSPM * 2 * Math.PI) / 60.0;
-                crankAngle += omega * dt;
+                crankAngle += baseOmega * dt * simulationSpeed;
             }
 
-            const link = solveLinkage(crankAngle);
+            // 1. Exact 4-Bar Kinematics
+            const linkage = solveLinkage(crankAngle);
             crankGroup.rotation.z = -crankAngle;
-            beamPivotGroup.rotation.z = link.thetaB;
+            beamPivotGroup.rotation.z = linkage.thetaB;
 
-            const rw = new THREE.Vector3(sampsonCenter.x - rearArm * Math.cos(link.thetaB), sampsonCenter.y - rearArm * Math.sin(link.thetaB), 0);
+            // 2. Pitman Arms
+            const rearWorld = new THREE.Vector3(
+                sampsonCenter.x - rearArm * Math.cos(linkage.thetaB),
+                sampsonCenter.y - rearArm * Math.sin(linkage.thetaB),
+                0
+            );
 
-            const m1 = new THREE.Vector3().addVectors(rw, link.cpWorld).multiplyScalar(0.5);
-            m1.z += 1.9; pitman1.position.copy(m1); pitman1.lookAt(rw.clone().setZ(1.9)); pitman1.rotateX(Math.PI / 2);
+            const mid1 = new THREE.Vector3().addVectors(rearWorld, linkage.crankPinWorld).multiplyScalar(0.5);
+            mid1.z += 1.9;
+            pitman1.position.copy(mid1);
+            pitman1.lookAt(rearWorld.clone().setZ(1.9));
+            pitman1.rotateX(Math.PI / 2);
 
-            const m2 = new THREE.Vector3().addVectors(rw, link.cpWorld).multiplyScalar(0.5);
-            m2.z -= 1.9; pitman2.position.copy(m2); pitman2.lookAt(rw.clone().setZ(-1.9)); pitman2.rotateX(Math.PI / 2);
+            const mid2 = new THREE.Vector3().addVectors(rearWorld, linkage.crankPinWorld).multiplyScalar(0.5);
+            mid2.z -= 1.9;
+            pitman2.position.copy(mid2);
+            pitman2.lookAt(rearWorld.clone().setZ(-1.9));
+            pitman2.rotateX(Math.PI / 2);
 
-            const rodDisp = (currentStroke / 2.0) * Math.sin(crankAngle);
-            const rodTopY = 3.6 + rodDisp;
-            carrierBar.position.set(0, rodTopY, 0);
-            suckerRod.position.y = (-35.0 + 2.5) + rodDisp;
-            plungerGroup.position.y = rodDisp;
+            // 3. Reciprocating Sucker Rod & Plunger
+            const rodDisplacement = (strokeM / 2.0) * Math.sin(crankAngle);
+            const polishedRodTopY = 3.6 + rodDisplacement;
 
-            const headTipY = sampsonCenter.y + frontArm * Math.sin(link.thetaB) + 1.2;
-            bridleMesh.position.set(0, (headTipY + rodTopY) / 2, 0);
-            bridleMesh.scale.y = Math.max(0.2, (headTipY - rodTopY) / 3.8);
+            carrierBar.position.set(0, polishedRodTopY, 0);
+            suckerRod.position.y = (-totalRodLength / 2 + 2.5) + rodDisplacement;
+            plungerGroup.position.y = rodDisplacement;
 
-            // Valve kinematics
+            // Bridle wirelines
+            const horseheadTipY = sampsonCenter.y + frontArm * Math.sin(linkage.thetaB) + 1.2;
+            bridleMesh.position.set(0, (horseheadTipY + polishedRodTopY) / 2, 0);
+            bridleMesh.scale.y = Math.max(0.2, (horseheadTipY - polishedRodTopY) / 3.8);
+
+            // 4. Downhole Valve Dynamics
             const isUpstroke = Math.cos(crankAngle) > 0;
             const banner = document.getElementById('stroke-phase-banner');
             const bText = document.getElementById('stroke-phase-text');
             const bIcon = document.getElementById('stroke-phase-icon');
 
             if (isUpstroke) {
-                tvBall.position.y = -1.35; svBall.position.y = -1.95;
+                // Upstroke: TV closed (lifts fluid), SV open (intake)
+                tvBall.position.y = -1.35;
+                svBall.position.y = -1.95;
                 if (banner && bText) {
-                    banner.className = "stroke-banner-up px-4 py-1.5 rounded-full text-xs font-mono font-bold tracking-wide shadow-lg transition-all flex items-center space-x-2";
+                    banner.className = "stroke-banner-up px-4 py-1.5 rounded-full text-xs font-mono font-bold tracking-wide shadow-lg transition-all duration-300 flex items-center space-x-2";
                     bIcon.innerText = "⬆️";
                     bText.innerText = "UPSTROKE: Traveling Valve CLOSED (Lifting) • Standing Valve OPEN (Intake)";
                 }
             } else {
-                tvBall.position.y = -1.15; svBall.position.y = -2.25;
+                // Downstroke: TV open (passing fluid), SV closed (holding)
+                tvBall.position.y = -1.15;
+                svBall.position.y = -2.25;
                 if (banner && bText) {
-                    banner.className = "stroke-banner-down px-4 py-1.5 rounded-full text-xs font-mono font-bold tracking-wide shadow-lg transition-all flex items-center space-x-2";
+                    banner.className = "stroke-banner-down px-4 py-1.5 rounded-full text-xs font-mono font-bold tracking-wide shadow-lg transition-all duration-300 flex items-center space-x-2";
                     bIcon.innerText = "⬇️";
                     bText.innerText = "DOWNSTROKE: Traveling Valve OPEN (Passing) • Standing Valve CLOSED (Holding)";
                 }
             }
 
-            const liveLoad = curLoad + 5.5 * Math.sin(crankAngle);
-            const loadEl = document.getElementById('hud-live-load');
-            if (loadEl) loadEl.innerText = liveLoad.toFixed(1) + ' kN';
+            // 5. Dynamic Load HUD
+            const dynamicLoad = stateData.srp_load_kn + 6.2 * Math.sin(crankAngle);
+            const liveLoadEl = document.getElementById('hud-live-load');
+            if (liveLoadEl) {
+                liveLoadEl.innerText = dynamicLoad.toFixed(1);
+            }
 
-            // Particles
-            const sArr = steamGeo.attributes.position.array;
+            // 6. Particle Dynamics
+            const sPos = steamGeo.attributes.position.array;
             for (let i = 0; i < steamCount; i++) {
-                sArr[i*3] += steamVels[i].vx; sArr[i*3+1] += steamVels[i].vy; sArr[i*3+2] += steamVels[i].vz;
-                if (sArr[i*3+1] > -44.0) sArr[i*3+1] = -70.0;
+                sPos[i * 3] += steamVels[i].vx;
+                sPos[i * 3 + 1] += steamVels[i].vy;
+                sPos[i * 3 + 2] += steamVels[i].vz;
+                if (sPos[i * 3 + 1] > -44.0) sPos[i * 3 + 1] = -70.0;
             }
             steamGeo.attributes.position.needsUpdate = true;
 
-            const oArr = oilGeo.attributes.position.array;
-            const flowSpeed = 0.3 * (curOil / 35.0);
+            const oPos = oilGeo.attributes.position.array;
+            const flowVel = 0.35 * (stateData.oil_rate_bpd / 35.0) * simulationSpeed;
             for (let i = 0; i < oilCount; i++) {
-                oArr[i*3+1] += flowSpeed;
-                if (oArr[i*3+1] > 1.2) oArr[i*3+1] = -58.0;
+                oPos[i * 3 + 1] += flowVel;
+                if (oPos[i * 3 + 1] > 1.2) oPos[i * 3 + 1] = -58.0;
             }
             oilGeo.attributes.position.needsUpdate = true;
 
-            if (showLabels) update3DPins();
+            // 7. Auto Orbit
+            if (isAutoOrbit) {
+                controls.autoRotate = true;
+                controls.autoRotateSpeed = 1.2;
+            } else {
+                controls.autoRotate = false;
+            }
+
+            // 8. Update 3D Pins
+            if (showLabels) {
+                update3DPins();
+            }
 
             controls.update();
             renderer.render(scene, camera);
         }
+
         animate();
 
-        // --- CAMERA VIEW PRESETS ---
+        // --- CAMERA VIEW PRESETS (HIGH SCALE FRAMING) ---
         function setCameraView(preset) {
             document.querySelectorAll('.view-btn').forEach(b => {
-                b.className = "view-btn px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-amber-600 hover:text-white text-slate-200 transition flex items-center space-x-1";
+                b.className = "view-btn px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/90 hover:bg-amber-600 hover:text-white text-slate-200 transition flex items-center space-x-1";
             });
 
             if (preset === 'surface') {
                 document.getElementById('btn-view-surface').className = "view-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-600 text-white transition flex items-center space-x-1";
-                smoothCamera(new THREE.Vector3(12.5, 8.5, 14.5), new THREE.Vector3(-2.8, 4.8, 0));
+                smoothCameraMove(new THREE.Vector3(12.5, 8.5, 14.5), new THREE.Vector3(-2.8, 4.8, 0));
                 inspectPart('walkingBeam');
             } else if (preset === 'pump') {
                 document.getElementById('btn-view-pump').className = "view-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-600 text-white transition flex items-center space-x-1";
-                smoothCamera(new THREE.Vector3(3.5, -54.5, 4.2), new THREE.Vector3(0, -56.0, 0));
+                smoothCameraMove(new THREE.Vector3(3.5, -54.5, 4.2), new THREE.Vector3(0, -56.0, 0));
                 inspectPart('downholePump');
             } else if (preset === 'reservoir') {
                 document.getElementById('btn-view-res').className = "view-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-600 text-white transition flex items-center space-x-1";
-                smoothCamera(new THREE.Vector3(18.0, -50.0, 20.0), new THREE.Vector3(0, -58.0, 0));
+                smoothCameraMove(new THREE.Vector3(18.0, -50.0, 20.0), new THREE.Vector3(0, -58.0, 0));
                 inspectPart('reservoir');
             } else if (preset === 'profile') {
                 document.getElementById('btn-view-prof').className = "view-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-600 text-white transition flex items-center space-x-1";
-                smoothCamera(new THREE.Vector3(48.0, -18.0, 52.0), new THREE.Vector3(0, -25.0, 0));
+                smoothCameraMove(new THREE.Vector3(48.0, -18.0, 52.0), new THREE.Vector3(0, -25.0, 0));
             }
         }
 
-        function smoothCamera(targetPos, targetLookAt) {
+        function smoothCameraMove(targetPos, targetLookAt) {
             const startPos = camera.position.clone();
             const startLook = controls.target.clone();
-            let p = 0;
+            let progress = 0;
+
             function step() {
-                p += 0.05;
-                if (p <= 1.0) {
-                    camera.position.lerpVectors(startPos, targetPos, p);
-                    controls.target.lerpVectors(startLook, targetLookAt, p);
+                progress += 0.045;
+                if (progress <= 1.0) {
+                    camera.position.lerpVectors(startPos, targetPos, progress);
+                    controls.target.lerpVectors(startLook, targetLookAt, progress);
                     requestAnimationFrame(step);
                 } else {
                     camera.position.copy(targetPos);
@@ -801,134 +1249,148 @@
             step();
         }
 
-        // --- COMPONENT INSPECTOR ---
+        // --- INTERACTIVE PART INSPECTOR ---
         const partDetails = {
-            'walkingBeam': { title: 'Walking Beam (Class I)', badge: 'SURFACE', desc: 'Converts rotary crank torque into reciprocating vertical polished rod motion via center saddle bearing.' },
-            'horsehead': { title: 'Horsehead & Bridle', badge: 'SURFACE', desc: 'Maintains pure vertical tangency over stuffing box centerline, preventing lateral rod bending moments.' },
-            'sampsonPost': { title: 'Samson Post', badge: 'STRUCTURE', desc: 'A-frame steel truss anchoring the center pivot to the 17m concrete foundation pad.' },
-            'crank': { title: 'Rotary Counterweights', badge: 'SURFACE', desc: 'Balances buoyant rod string weight to smooth motor power demand and cut peak electrical draw.' },
-            'stuffingBox': { title: 'Stuffing Box', badge: 'WELLHEAD', desc: 'Surface pressure seal preventing crude and steam leakage around the moving polished rod.' },
-            'downholePump': { title: 'Downhole Pump Barrel', badge: 'SUBSEA', desc: 'Stationary barrel at -56m depth. Alternates valve states on upstroke/downstroke to lift crude.' },
-            'reservoir': { title: 'Jodhpur Sandstone', badge: 'FORMATION', desc: 'Heavy oil formation. Injected cyclic steam heats cold crude from 48°C, slashing viscosity.' }
+            'walkingBeam': {
+                title: 'Walking Beam & Center Saddle Bearing',
+                badge: 'CLASS I LEVER',
+                desc: 'Rigid structural wide-flange I-beam oscillating about the center Samson post saddle bearing. Converts pitman arm reciprocating thrust into vertical polished rod displacement.',
+                stats: `• Pumping Cadence: ${stateData.spm.toFixed(1)} SPM<br>• Stroke Length: ${stateData.stroke_m.toFixed(2)} m<br>• Dynamic Load: ${stateData.srp_load_kn.toFixed(1)} kN`
+            },
+            'horsehead': {
+                title: 'Horsehead & Flexible Wireline Bridle',
+                badge: 'VERTICAL TANGENCY',
+                desc: 'Circular arc head with radius equal to the front beam length (4.6m). Ensures the flexible bridle cables remain tangent to the wellhead centerline, preventing lateral bending fatigue on the polished rod.',
+                stats: `• Arc Radius: 4.60 m<br>• Lateral Deflection: 0.00 mm (True Tangent)<br>• Carrier Bar Load: ${stateData.srp_load_kn.toFixed(1)} kN`
+            },
+            'sampsonPost': {
+                title: 'Structural Samson Post & A-Frame Truss',
+                badge: 'STRUCTURAL SUPPORT',
+                desc: 'Latticed A-frame steel structure anchoring the center saddle bearing to the concrete foundation pad. Absorbs cyclic bending moments and full dynamic rod string tension.',
+                stats: `• Post Height: 7.60 m<br>• Structural Material: Heavy API Spec Steel<br>• Anchor: 17m x 13m Concrete Cellar Pad`
+            },
+            'crank': {
+                title: 'Rotary Crank & Slotted Counterweights',
+                badge: 'ENERGY BALANCING',
+                desc: 'Heavy cast-iron counterweights rotating at ${stateData.spm.toFixed(1)} SPM. Counterbalances the buoyant rod weight, smoothing electric motor peak torque and cutting energy consumption.',
+                stats: `• Crank Radius: 1.45 m<br>• Angular Velocity: ${(stateData.spm * 2 * Math.PI / 60).toFixed(2)} rad/s<br>• Gearbox: Double Reduction`
+            },
+            'stuffingBox': {
+                title: 'Stuffing Box & Polished Rod Wellhead',
+                badge: 'PRESSURE CONTAINMENT',
+                desc: 'Surface seal preventing high-pressure heavy crude and steam blowby around the reciprocating polished rod. Feeds production fluid directly into the surface gathering flowline.',
+                stats: `• Formation Pressure: 24.2 bar<br>• Wellhead Temp: ~${(stateData.temperature_c * 0.85).toFixed(1)} °C<br>• Flowline: 4-inch Insulated Schedule 40`
+            },
+            'downholePump': {
+                title: 'Downhole Sucker Rod Pump (API Barrel & Plunger)',
+                badge: 'DOWNHOLE PUMP',
+                desc: 'Deep reciprocating pump at -56m depth inside the Jodhpur Sandstone. Alternates between opening the Traveling Valve on downstroke and the Standing Valve on upstroke to lift viscous crude.',
+                stats: `• Setting Depth: -56.0 m<br>• Pump Fillage: ${stateData.pump_fillage_pct.toFixed(1)} %<br>• Net Oil Rate: ${stateData.oil_rate_bpd.toFixed(1)} bpd`
+            },
+            'travelingValve': {
+                title: 'Traveling Valve (Plunger Ball & Seat)',
+                badge: 'VALVE DYNAMICS',
+                desc: 'Located inside the reciprocating plunger. Closes on UPSTROKE to lift the heavy hydrostatic oil column; opens on DOWNSTROKE to allow the plunger to sink through viscous crude.',
+                stats: `• Upstroke State: CLOSED (Column Lift)<br>• Downstroke State: OPEN (Fluid Passage)<br>• Valve Ball: Tungsten Carbide`
+            },
+            'standingValve': {
+                title: 'Standing Valve (Barrel Base Ball & Seat)',
+                badge: 'VALVE DYNAMICS',
+                desc: 'Stationary ball valve at the bottom of the pump barrel. Opens on UPSTROKE under reservoir pressure to draw oil in; closes on DOWNSTROKE under hydrostatic column head.',
+                stats: `• Upstroke State: OPEN (Inflow Intake)<br>• Downstroke State: CLOSED (Hydrostatic Hold)<br>• Reservoir Pressure: 24.2 bar`
+            },
+            'reservoir': {
+                title: 'Jodhpur Sandstone Heavy Oil Formation',
+                badge: 'THERMAL RESERVOIR',
+                desc: 'Target heavy-oil reservoir (Baghewala field). Injected cyclic steam transfers heat, heating cold crude from 48°C up to ${stateData.temperature_c.toFixed(1)}°C and slashing viscosity from 28.5 kcP down to ${stateData.viscosity_kcp.toFixed(2)} kcP.',
+                stats: `• Temperature: ${stateData.temperature_c.toFixed(1)} °C<br>• Viscosity: ${stateData.viscosity_kcp.toFixed(2)} kcP<br>• CSS Phase: ${stateData.phase.toUpperCase()}`
+            },
+            'tubing': {
+                title: 'Production Tubing String (Cutaway)',
+                badge: 'FLUID CONDUIT',
+                desc: 'Internal steel tubing string through which heated heavy crude is lifted to surface. Visualized with transparent cutaway displaying upward fluid streamline velocity.',
+                stats: `• Production Rate: ${stateData.oil_rate_bpd.toFixed(1)} bpd<br>• Viscosity: ${stateData.viscosity_kcp.toFixed(2)} kcP`
+            }
         };
 
-        function inspectPart(key) {
-            const d = partDetails[key];
-            if (!d) return;
-            document.getElementById('insp-title').innerText = d.title;
-            document.getElementById('insp-badge').innerText = d.badge;
-            document.getElementById('insp-desc').innerText = d.desc;
+        function inspectPart(partKey) {
+            const data = partDetails[partKey];
+            if (!data) return;
+
+            document.getElementById('insp-title').innerText = data.title;
+            document.getElementById('insp-badge').innerText = data.badge;
+            document.getElementById('insp-desc').innerHTML = data.desc;
+            document.getElementById('insp-stats').innerHTML = data.stats;
+
+            const card = document.getElementById('inspector-card');
+            card.classList.add('ring-2', 'ring-amber-400');
+            setTimeout(() => card.classList.remove('ring-2', 'ring-amber-400'), 800);
         }
 
-        // --- REAL-TIME COUPLED PHYSICS MODEL ---
-        function updatePhysics() {
-            currentSteam = parseFloat(document.getElementById('slider-steam').value);
-            currentSoak = parseFloat(document.getElementById('slider-soak').value);
-            currentSPM = parseFloat(document.getElementById('slider-spm').value);
-            currentStroke = parseFloat(document.getElementById('slider-stroke').value);
+        // Raycast click
+        window.addEventListener('click', (event) => {
+            const rect = container.getBoundingClientRect(); mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
 
-            document.getElementById('val-steam').innerText = currentSteam.toFixed(0) + ' t';
-            document.getElementById('val-soak').innerText = currentSoak.toFixed(0) + ' h';
-            document.getElementById('val-spm').innerText = currentSPM.toFixed(1) + ' SPM';
-            document.getElementById('val-stroke').innerText = currentStroke.toFixed(2) + ' m';
-            document.getElementById('hud-spm-badge').innerText = currentSPM.toFixed(1) + ' SPM';
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(inspectableObjects, true);
 
-            // 1. Thermal Balance
-            const deltaT = 42.0 * (currentSteam / 110.0);
-            const soakLoss = Math.exp(-currentSoak / 96.0);
-            curTemp = 48.0 + deltaT * soakLoss;
-
-            // 2. Viscosity Correlation
-            curVisc = 28.5 * Math.exp(-0.048 * (curTemp - 48.0));
-
-            // 3. Inflow Model
-            const PI = 0.00708 * (45.0 * 8.0) / (curVisc * 1.05 * 4.8);
-            const drawdown = 24.2 - 21.4;
-            const inflowRate = Math.max(8.0, PI * drawdown * 18.0);
-
-            // 4. SRP Response
-            const strokeDisp = (Math.PI * Math.pow(0.044, 2) / 4.0) * currentStroke * currentSPM * 1440 * 6.2898;
-            curFillage = Math.min(95.0, Math.max(40.0, (inflowRate / Math.max(1.0, strokeDisp)) * 100.0));
-            curOil = Math.min(inflowRate, strokeDisp * (curFillage / 100.0));
-
-            // 5. Rod Load
-            const fluidLoad = (curFillage / 100.0) * 18.5;
-            const viscFriction = curVisc * 0.45;
-            curLoad = 24.5 + fluidLoad + viscFriction;
-
-            // Update Displays
-            document.getElementById('hud-temp').innerText = curTemp.toFixed(1) + ' °C';
-            document.getElementById('hud-visc').innerText = curVisc.toFixed(2) + ' kcP';
-            document.getElementById('hud-oil').innerText = curOil.toFixed(1) + ' bpd';
-            document.getElementById('hud-fillage').innerText = curFillage.toFixed(1) + ' %';
-
-            document.getElementById('out-temp').innerText = curTemp.toFixed(1) + ' °C';
-            document.getElementById('out-visc').innerText = curVisc.toFixed(2) + ' kcP';
-            document.getElementById('out-oil').innerText = curOil.toFixed(1) + ' bpd';
-            document.getElementById('out-load').innerText = curLoad.toFixed(1) + ' kN';
-            document.getElementById('out-fillage').innerText = curFillage.toFixed(1) + ' %';
-
-            // Constraints check
-            const isSteamOk = currentSteam <= 118.0;
-            const isLoadOk = curLoad <= 62.0;
-            const isFillageOk = curFillage >= 52.0;
-            const isSpmOk = currentSPM >= 5.0 && currentSPM <= 10.0;
-            const isFeasible = isSteamOk && isLoadOk && isFillageOk && isSpmOk;
-
-            const fb = document.getElementById('feasibility-banner');
-            if (isFeasible) {
-                fb.className = "p-3.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 text-xs font-semibold flex items-center justify-between";
-                fb.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <span class="text-base">✅</span>
-                        <span>FEASIBLE SETPOINT: All prototype constraints satisfied (Load &le; 62.0 kN, Fillage &ge; 52.0%, Steam &le; 118 t).</span>
-                    </div>
-                    <span class="px-2.5 py-1 rounded bg-emerald-500/20 font-mono font-bold">FEASIBLE</span>
-                `;
-            } else {
-                let reason = !isSteamOk ? "Steam mass exceeds generator envelope (> 118 t)" :
-                             !isLoadOk ? "Rod load exceeds safety limit (> 62.0 kN)" :
-                             !isFillageOk ? "Pump fillage below limit (< 52.0%)" : "SPM outside operational limits (5.0 - 10.0)";
-                fb.className = "p-3.5 rounded-xl border border-rose-500/40 bg-rose-500/10 text-rose-400 text-xs font-semibold flex items-center justify-between";
-                fb.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <span class="text-base">⚠️</span>
-                        <span>CONSTRAINT BREACH REJECTED: ${reason}.</span>
-                    </div>
-                    <span class="px-2.5 py-1 rounded bg-rose-500/20 font-mono font-bold">REJECTED</span>
-                `;
+            if (intersects.length > 0) {
+                let obj = intersects[0].object;
+                while (obj && !obj.userData.partKey && obj.parent) {
+                    obj = obj.parent;
+                }
+                if (obj && obj.userData.partKey) {
+                    inspectPart(obj.userData.partKey);
+                }
             }
+        });
 
-            // Update Reservoir thermal color
-            const norm = Math.max(0, Math.min(1, (curTemp - 48) / 36));
-            matReservoir.color.setHSL(0.03 + norm * 0.08, 0.98, 0.44 + norm * 0.35);
-            matReservoir.emissive.setHSL(0.03 + norm * 0.08, 0.98, 0.44 + norm * 0.35);
-            reservoirLight.color.setHSL(0.03 + norm * 0.08, 0.98, 0.44 + norm * 0.35);
-        }
-
-        function resetSliders() {
-            document.getElementById('slider-steam').value = 110;
-            document.getElementById('slider-soak').value = 48;
-            document.getElementById('slider-spm').value = 7.0;
-            document.getElementById('slider-stroke').value = 1.55;
-            updatePhysics();
+        // --- BUTTON HANDLERS ---
+        function setSimSpeed(speed) {
+            simulationSpeed = speed;
+            document.querySelectorAll('.speed-btn').forEach(btn => {
+                btn.className = "speed-btn px-2 py-0.5 rounded text-[10px] bg-slate-800 hover:bg-amber-600 text-slate-300";
+            });
+            if (event && event.target) {
+                event.target.className = "speed-btn px-2 py-0.5 rounded text-[10px] bg-amber-600 text-white font-bold";
+            }
         }
 
         function togglePlayPause() {
             isPaused = !isPaused;
-            document.getElementById('btn-pause').innerText = isPaused ? "▶️" : "⏸️";
+            const btn = document.getElementById('btn-pause');
+            if (btn) {
+                btn.innerText = isPaused ? "▶️" : "⏸️";
+                btn.className = isPaused ? "px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-amber-600 text-white transition" : "px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 transition";
+            }
+        }
+
+        function toggleAutoOrbit() {
+            isAutoOrbit = !isAutoOrbit;
+            const btn = document.getElementById('btn-auto-orbit');
+            if (btn) {
+                btn.className = isAutoOrbit ? "px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-amber-600 text-white transition" : "px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 transition";
+            }
         }
 
         function toggleLabels() {
             showLabels = !showLabels;
-            document.getElementById('pins-container').style.display = showLabels ? 'block' : 'none';
+            const container = document.getElementById('pins-container');
+            const btn = document.getElementById('btn-labels');
+            if (container) {
+                container.style.display = showLabels ? 'block' : 'none';
+            }
+            if (btn) {
+                btn.className = showLabels ? "px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-amber-600 text-white transition" : "px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 transition";
+            }
         }
 
         function toggleFullscreen() {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(() => {});
+                document.documentElement.requestFullscreen().catch(err => {});
             } else {
-                document.exitFullscreen().catch(() => {});
+                document.exitFullscreen().catch(err => {});
             }
         }
 
@@ -942,14 +1404,20 @@
                 { id: 'pin-reservoir', pos: new THREE.Vector3(8, -58, 0) },
                 { id: 'pin-pump', pos: new THREE.Vector3(0, -56, 0) }
             ];
+
             targets.forEach(t => {
                 const el = document.getElementById(t.id);
                 if (!el) return;
                 const p = t.pos.clone().project(camera);
-                if (p.z > 1) { el.style.display = 'none'; return; }
+                if (p.z > 1) {
+                    el.style.display = 'none';
+                    return;
+                }
                 el.style.display = 'block';
-                el.style.left = `${(p.x * 0.5 + 0.5) * container.clientWidth}px`;
-                el.style.top = `${(-p.y * 0.5 + 0.5) * container.clientHeight}px`;
+                const x = (p.x * 0.5 + 0.5) * container.clientWidth;
+                const y = (-(p.y * 0.5) + 0.5) * container.clientHeight;
+                el.style.left = `${x}px`;
+                el.style.top = `${y}px`;
             });
         }
 
@@ -958,6 +1426,137 @@
             camera.updateProjectionMatrix();
             renderer.setSize(container.clientWidth, container.clientHeight);
         });
+    
+
+
+        // --- REAL-TIME COUPLED PHYSICS INTERACTION BRIDGE ---
+        let currentSteam = 110.0;
+        let currentSoak = 48.0;
+        let currentSPM = 6.7;
+        let currentStroke = 1.52;
+
+        window.updatePhysicsFromSliders = function() {
+            const steamEl = document.getElementById('slider-steam');
+            const soakEl = document.getElementById('slider-soak');
+            const spmEl = document.getElementById('slider-spm');
+            const strokeEl = document.getElementById('slider-stroke');
+
+            if (!steamEl || !soakEl || !spmEl || !strokeEl) return;
+
+            currentSteam = parseFloat(steamEl.value);
+            currentSoak = parseFloat(soakEl.value);
+            currentSPM = parseFloat(spmEl.value);
+            currentStroke = parseFloat(strokeEl.value);
+
+            // Update slider display labels
+            const valSteam = document.getElementById('sidebar-val-steam');
+            const valSoak = document.getElementById('sidebar-val-soak');
+            const valSpm = document.getElementById('sidebar-val-spm');
+            const valStroke = document.getElementById('sidebar-val-stroke');
+            if (valSteam) valSteam.innerText = currentSteam.toFixed(0) + ' t';
+            if (valSoak) valSoak.innerText = currentSoak.toFixed(0) + ' h';
+            if (valSpm) valSpm.innerText = currentSPM.toFixed(1) + ' SPM';
+            if (valStroke) valStroke.innerText = currentStroke.toFixed(2) + ' m';
+
+            // Top bar SPM badge
+            const topSpm = document.getElementById('top-spm-val');
+            if (topSpm) topSpm.innerText = currentSPM.toFixed(1) + ' SPM';
+            const hudSpm = document.getElementById('hud-spm-tag');
+            if (hudSpm) hudSpm.innerText = currentSPM.toFixed(1) + ' SPM • ' + currentStroke.toFixed(2) + 'm';
+
+            // 1. Thermal Balance
+            const deltaT = 42.0 * (currentSteam / 110.0);
+            const soakLoss = Math.exp(-currentSoak / 96.0);
+            stateData.temperature_c = 48.0 + deltaT * soakLoss;
+
+            // 2. Viscosity Correlation
+            stateData.viscosity_kcp = 28.5 * Math.exp(-0.048 * (stateData.temperature_c - 48.0));
+
+            // 3. Inflow Model
+            const PI = 0.00708 * (45.0 * 8.0) / (stateData.viscosity_kcp * 1.05 * 4.8);
+            const drawdown = 24.2 - 21.4;
+            const inflowRate = Math.max(8.0, PI * drawdown * 18.0);
+
+            // 4. SRP Response
+            const strokeDisp = (Math.PI * Math.pow(0.044, 2) / 4.0) * currentStroke * currentSPM * 1440 * 6.2898;
+            stateData.pump_fillage_pct = Math.min(95.0, Math.max(40.0, (inflowRate / Math.max(1.0, strokeDisp)) * 100.0));
+            stateData.oil_rate_bpd = Math.min(inflowRate, strokeDisp * (stateData.pump_fillage_pct / 100.0));
+
+            // 5. Rod Load
+            const fluidLoad = (stateData.pump_fillage_pct / 100.0) * 18.5;
+            const viscFriction = stateData.viscosity_kcp * 0.45;
+            stateData.srp_load_kn = 24.5 + fluidLoad + viscFriction;
+            stateData.spm = currentSPM;
+            stateData.stroke_m = currentStroke;
+
+            // Live update 3D parameters
+            baseOmega = (stateData.spm * 2 * Math.PI) / 60.0;
+            strokeM = stateData.stroke_m;
+
+            // Update Reservoir thermal color
+            const newThermalColor = getThermalColor(stateData.temperature_c);
+            matReservoir.color.copy(newThermalColor);
+            matReservoir.emissive.copy(newThermalColor);
+            reservoirLight.color.copy(newThermalColor);
+
+            // Update HUD Displays
+            const hudTemp = document.getElementById('hud-temp');
+            const hudVisc = document.getElementById('hud-visc');
+            const hudOil = document.getElementById('hud-oil');
+            const hudFillage = document.getElementById('hud-fillage');
+            if (hudTemp) hudTemp.innerText = stateData.temperature_c.toFixed(1) + ' °C';
+            if (hudVisc) hudVisc.innerText = stateData.viscosity_kcp.toFixed(2) + ' kcP';
+            if (hudOil) hudOil.innerText = stateData.oil_rate_bpd.toFixed(1) + ' bpd';
+            if (hudFillage) hudFillage.innerText = stateData.pump_fillage_pct.toFixed(1) + ' %';
+
+            // Check constraints
+            const isSteamOk = currentSteam <= 118.0;
+            const isLoadOk = stateData.srp_load_kn <= 62.0;
+            const isFillageOk = stateData.pump_fillage_pct >= 52.0;
+            const isSpmOk = currentSPM >= 5.0 && currentSPM <= 10.0;
+            const isFeasible = isSteamOk && isLoadOk && isFillageOk && isSpmOk;
+
+            const fCard = document.getElementById('sidebar-feasibility-card');
+            if (fCard) {
+                if (isFeasible) {
+                    fCard.className = "p-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-[11px] font-semibold flex items-center space-x-2";
+                    fCard.innerHTML = "<span>✅</span><span>FEASIBLE SETPOINT</span>";
+                } else {
+                    let reason = !isSteamOk ? "Steam > 118 t" :
+                                 !isLoadOk ? "Load > 62 kN" :
+                                 !isFillageOk ? "Fillage < 52%" : "SPM outside 5-10";
+                    fCard.className = "p-2.5 rounded-lg border border-rose-500/40 bg-rose-500/10 text-rose-400 text-[11px] font-semibold flex items-center space-x-2";
+                    fCard.innerHTML = `<span>⚠️</span><span>REJECTED (${reason})</span>`;
+                }
+            }
+        };
+
+        window.resetSliders = function() {
+            document.getElementById('slider-steam').value = 110;
+            document.getElementById('slider-soak').value = 48;
+            document.getElementById('slider-spm').value = 6.7;
+            document.getElementById('slider-stroke').value = 1.52;
+            updatePhysicsFromSliders();
+        };
+
+        window.toggleSidebar = function() {
+            const sb = document.getElementById('main-sidebar');
+            const btn = document.getElementById('sidebar-toggle-btn');
+            if (!sb) return;
+            if (sb.classList.contains('hidden')) {
+                sb.classList.remove('hidden');
+                if (btn) btn.innerText = "◀";
+            } else {
+                sb.classList.add('hidden');
+                if (btn) btn.innerText = "▶";
+            }
+            setTimeout(() => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            }, 100);
+        };
+    
     </script>
 </body>
 </html>
