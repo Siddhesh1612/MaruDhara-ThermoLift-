@@ -1,0 +1,22 @@
+flowchart LR
+    A["Synthetic well CSV\nreplaceable with OIL telemetry later"] --> B["Data quality + schema\nvalidation"]
+    B --> C["Current well state\npressure · temperature · viscosity · SRP"]
+    C --> D["CSS thermal model\ninjection · soak · production"]
+    D --> E["Temperature → viscosity\nconfigurable correlation"]
+    E --> F["Viscosity → inflow\npressure + mobility"]
+    F --> G["Quasi-dynamic SRP model\nfillage · load · energy"]
+    G --> H["Scenario engine\n50–100 CSS × SRP candidates"]
+    H --> I["Hard constraint filter\nfeasible / rejected + reason"]
+    I --> J["Transparent ranking\noil · steam · energy · risk"]
+    J --> K["Recommendation + explanation\noperator approval"]
+    K --> L["Replay + validation\ntemporal · physics · counterfactual"]
+    L -. feedback .-> C
+    C -. observability .-> M["Streamlit dashboard\n3D state layer later"]
+    K -. audit .-> N[("SQLite MVP\nPostgreSQL later")]
+    style A fill:#17344b,color:#fff,stroke:#f0a64c
+    style D fill:#f5c88e,color:#102336,stroke:#b66e23
+    style I fill:#9bd8ba,color:#102336,stroke:#1f8065
+    style J fill:#f5c88e,color:#102336,stroke:#b66e23
+    style K fill:#9bd8ba,color:#102336,stroke:#1f8065
+    style M fill:#17344b,color:#fff,stroke:#6b9bc5
+    style N fill:#17344b,color:#fff,stroke:#6b9bc5

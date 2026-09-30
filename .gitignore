@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment & Secrets (CRITICAL: Never commit real API keys or DB credentials)
+.env
+.env.local
+.env.*.local
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Testing & Caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Streamlit local secrets
+.streamlit/secrets.toml
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Vercel deployment cache
+.vercel/

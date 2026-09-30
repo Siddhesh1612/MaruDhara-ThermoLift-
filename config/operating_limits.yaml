@@ -1,0 +1,49 @@
+operating_limits:
+  min_pump_fillage_pct:
+    value: 52.0
+    unit: "%"
+    bound: "MIN"
+    description: "Configurable minimum pump fillage before fluid pound / low efficiency rejection"
+    status: "CONFIGURABLE PROTOTYPE ASSUMPTION"
+  max_srp_load_kn:
+    value: 62.0
+    unit: "kN"
+    bound: "MAX"
+    description: "Configurable maximum polished rod load before equipment risk rejection"
+    status: "CONFIGURABLE PROTOTYPE ASSUMPTION"
+  max_steam_mass_t:
+    value: 118.0
+    unit: "t"
+    bound: "MAX"
+    description: "Configurable prototype steam injection upper envelope limit"
+    status: "CONFIGURABLE PROTOTYPE ASSUMPTION"
+  min_spm:
+    value: 5.0
+    unit: "SPM"
+    bound: "MIN"
+    description: "Minimum operational sucker rod pump speed"
+    status: "CONFIGURABLE PROTOTYPE ASSUMPTION"
+  max_spm:
+    value: 10.0
+    unit: "SPM"
+    bound: "MAX"
+    description: "Maximum operational sucker rod pump speed"
+    status: "CONFIGURABLE PROTOTYPE ASSUMPTION"
+  min_stroke_m:
+    value: 1.45
+    unit: "m"
+    bound: "MIN"
+    description: "Minimum stroke length setting"
+    status: "CONFIGURABLE PROTOTYPE ASSUMPTION"
+  max_stroke_m:
+    value: 1.65
+    unit: "m"
+    bound: "MAX"
+    description: "Maximum stroke length setting"
+    status: "CONFIGURABLE PROTOTYPE ASSUMPTION"
+
+default_weights:
+  w_oil: 1.0
+  w_steam: 0.0
+  w_energy: 0.45
+  w_risk: 0.25

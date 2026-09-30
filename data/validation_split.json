@@ -1,0 +1,14 @@
+{
+  "seed":26120,
+  "calibration_cycles":[
+    1,
+    2
+  ],
+  "validation_cycle":[
+    3
+  ],
+  "test_cycle":[
+    4
+  ],
+  "note":"Synthetic metrics are demonstration outputs only and are not field accuracy."
+}

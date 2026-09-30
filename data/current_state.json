@@ -1,0 +1,30 @@
+[
+  {
+    "well_id":"BWG-SIM-001",
+    "field_label":"Baghewala-style representative",
+    "cycle_id":4,
+    "timestamp":"2026-05-10T23:00:00",
+    "phase":"production",
+    "reservoir_pressure_bar":20.735,
+    "bottomhole_pressure_bar":17.935,
+    "steam_mass_t":116,
+    "steam_pressure_bar":34.2,
+    "steam_injection_duration_h":42,
+    "soak_duration_h":56,
+    "production_duration_h":574,
+    "temperature_c":48.0,
+    "viscosity_kcp":14.314,
+    "inflow_bpd":34.439,
+    "oil_rate_bpd":23.647,
+    "water_rate_bpd":15.0,
+    "pump_speed_spm":6.725,
+    "stroke_length_m":1.519,
+    "pump_fillage_pct":46.345,
+    "srp_load_kn":57.174,
+    "energy_kwh_bbl":23.908,
+    "srp_risk_score":35,
+    "data_quality":"GOOD",
+    "source_label":"SYNTHETIC",
+    "random_seed":26120
+  }
+]
